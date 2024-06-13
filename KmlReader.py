@@ -6,7 +6,7 @@ from pygeoif import LineString, Polygon, MultiPolygon
 def get_coordinates_from_kml(file):
     with open(file, 'rt') as file:
         doc = file.read()
-        print(doc)
+        # print(doc)
         k = kml.KML()
         k.from_string(doc.encode('utf-8'))
 
@@ -57,9 +57,9 @@ def parse_mask_features(placemark, mask_polygons):
         for polygon in multi_polygon.geoms:
             print(type(polygon))
             if isinstance(polygon, Polygon):
-                mask_polygons.append(polygon)
+                mask_polygons.append(polygon.exterior.coords) # I MADE A CHANGE HERE
     elif isinstance(placemark.geometry, Polygon):
-        mask_polygons.append(placemark.geometry)
+        mask_polygons.append(placemark.geometry.exterior.coords) # AND HERE
     return mask_polygons
 
 # parse_mask to parse_mask_polygon to parse_mask_polygons
