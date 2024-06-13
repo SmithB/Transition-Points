@@ -63,6 +63,8 @@ def parse_mask_features(placemark, mask_polygons):
     return mask_polygons
 
 # parse_mask to parse_mask_polygon to parse_mask_polygons
+
+
 def parse_mask(file):
     with open(file, 'rt') as file:
         doc = file.read()
@@ -76,7 +78,7 @@ def parse_mask(file):
         return mask_polygons
 
 
-# print(get_coordinates_from_kml('/Users/pvelmuru/Desktop/IS2_RGT_0001_cycle12_23-Jun-2021.kml'))
+print(get_coordinates_from_kml('/Users/pvelmuru/Desktop/IS2_RGT_0001_cycle12_23-Jun-2021.kml'))
 # print(get_coordinates_from_kml('/Users/pvelmuru/Desktop/snow_depth_mask.kml'))
 # print(get_coordinates_from_kml('/Users/pvelmuru/Downloads/Placemark.kml'))
 # print(get_coordinates_from_kml('/Users/pvelmuru/Downloads/Polygon.kml'))
