@@ -40,6 +40,7 @@ def test_get():
     intersection_list_gcs = Conversions.cartesian_list_to_gcs(intersection.geoms[1].coords)
     # print(intersection.geoms[0])
     print("COORDS: ", intersection.geoms[1].coords[0])
+    print(type(intersection.geoms[1]))
     print("OTHER: ", intersection_list_gcs[0])
     return intersection_list_gcs
     # return intersection_list_gcs[0]

@@ -1,4 +1,4 @@
-from pyproj import Transformer
+from pyproj import Transformer, Geod
 
 
 to_gcs_transform = Transformer.from_crs("EPSG:3857", "EPSG:4326")
@@ -52,6 +52,15 @@ def cartesian_to_gcs(x, y):
     gcs_coordinates = to_gcs_transform.transform(x, y)
     return tuple((gcs_coordinates[1], gcs_coordinates[0]))
 
+
+def get_geodesic_length(line_obj):
+    """
+    This function gets the geodesic length of a LineString object in km
+    :param line_obj: LineString object
+    :return: Geodesic length of the line in kilometers
+    """
+    geod = Geod(ellps="WGS84")
+    return geod.geometry_length(line_obj) / 1000
 
 # print(gcs_to_cartesian(90, 180))
 
