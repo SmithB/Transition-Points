@@ -28,7 +28,7 @@ def cartesian_list_to_gcs(cartesian_list):
     gcs_list = []
     for coordinates in cartesian_list:
         gcs_list.append(cartesian_to_gcs(coordinates[0], coordinates[1]))
-    return cartesian_list
+    return gcs_list
 
 
 def gcs_to_cartesian(latitude, longitude):
@@ -50,7 +50,7 @@ def cartesian_to_gcs(x, y):
     :return: tuple of (latitude, longitude) of EPSG:4326
     """
     gcs_coordinates = to_gcs_transform.transform(x, y)
-    return gcs_coordinates
+    return tuple((gcs_coordinates[1], gcs_coordinates[0]))
 
 
 # print(gcs_to_cartesian(90, 180))

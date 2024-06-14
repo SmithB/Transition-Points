@@ -28,7 +28,7 @@ def parse_features(document, coordinates):
 
 
 def parse_placemark(placemark, coordinates):
-    print(type(placemark.geometry))
+    # print(type(placemark.geometry))
     if isinstance(placemark.geometry, LineString):
         coordinates.extend(placemark.geometry.coords)
     elif isinstance(placemark.geometry, Polygon):
@@ -49,13 +49,13 @@ def parse_mask_polygons(document, mask_polygons):
 
 
 def parse_mask_features(placemark, mask_polygons):
-    print(type(placemark.geometry))
+    # print(type(placemark.geometry))
     if isinstance(placemark.geometry, MultiPolygon):
-        print("here")
+        # print("here")
         multi_polygon = placemark.geometry
         # print(multi_polygon.geoms[0])
         for polygon in multi_polygon.geoms:
-            print(type(polygon))
+            # print(type(polygon))
             if isinstance(polygon, Polygon):
                 mask_polygons.append(polygon.exterior.coords) # I MADE A CHANGE HERE
     elif isinstance(placemark.geometry, Polygon):
@@ -78,7 +78,7 @@ def parse_mask(file):
         return mask_polygons
 
 
-# print(get_coordinates_from_kml('/Users/pvelmuru/Desktop/IS2_RGT_0001_cycle12_23-Jun-2021.kml'))
+print("HMM", get_coordinates_from_kml('/Users/pvelmuru/Desktop/IS2_RGT_0001_cycle12_23-Jun-2021.kml'))
 # print(get_coordinates_from_kml('/Users/pvelmuru/Desktop/snow_depth_mask.kml'))
 # print(get_coordinates_from_kml('/Users/pvelmuru/Downloads/Placemark.kml'))
 # print(get_coordinates_from_kml('/Users/pvelmuru/Downloads/Polygon.kml'))
