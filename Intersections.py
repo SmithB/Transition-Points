@@ -19,7 +19,7 @@ def modify_ocean_mask(ocean_mask, rgt_mask):
 
 # TEST
 orbit_gcs = Kr.get_coordinates_from_kml('/Users/pvelmuru/Desktop/IS2_RGT_0001_cycle12_23-Jun-2021.kml')
-# print(orbit_gcs)
+print(orbit_gcs)
 orbit_cart = Conversions.gcs_list_to_cartesian(orbit_gcs)
 orbit_line = LineString(orbit_cart)
 
@@ -28,9 +28,10 @@ print(mask_gcs)
 mask_cart = Conversions.gcs_list_to_cartesian(mask_gcs)
 print(mask_cart)
 mask_polygon = Polygon(mask_cart)
-breakpoint()
 
-# print(orbit_line)
+
+print(orbit_line)
+
 
 intersection_list = find_intersections(orbit_line, mask_polygon)
 

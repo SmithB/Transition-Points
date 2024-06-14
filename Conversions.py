@@ -13,9 +13,11 @@ def gcs_list_to_cartesian(gcs_list):
     """
     cartesian_list = []
     for coordinates in gcs_list:
-        cartesian_list.append(gcs_to_cartesian(coordinates[0], coordinates[1]))
+        cartesian_list.append(gcs_to_cartesian(coordinates[1], coordinates[0]))
     return cartesian_list
 
+
+#  check if this works
 
 def cartesian_list_to_gcs(cartesian_list):
     """
@@ -51,7 +53,7 @@ def cartesian_to_gcs(x, y):
     return gcs_coordinates
 
 
-
+# print(gcs_to_cartesian(90, 180))
 
 # x = 4328369.131354082
 # y = 4997071.061740645
