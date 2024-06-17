@@ -30,17 +30,27 @@ from pyproj import Geod
 # print(distance)
 
 # Next Test
+
+# TODO find out where this code should go in main
 def test_rgt_and_mask_intersection():
     mask_gcs_coords = Kr.parse_mask('/Users/pvelmuru/Desktop/snow_depth_mask.kml')
     mask_polygons_cart = [Polygon(Conversions.gcs_list_to_cartesian(coords)) for coords in mask_gcs_coords]
     mask_multipolygon = MultiPolygon(mask_polygons_cart)
 
-    land_gcs_coords = Kr.parse_mask('/Users/pvelmuru/PycharmProjects/Transistion Points/assets/land_mask.kml')
+    land_gcs_coords = Kr.parse_mask('/Users/pvelmuru/PycharmProjects/Transistion Points//assets/land_mask.kml')
     land_polygon_cart = [Polygon(Conversions.gcs_list_to_cartesian(coordinates)) for coordinates in land_gcs_coords]
     land_multipolygon = MultiPolygon(land_polygon_cart)
+
+    # Added in Intersections
     intersection = mask_multipolygon.intersection(land_multipolygon)
     intersection_cart = [Polygon(Conversions.cartesian_list_to_gcs(polygon.exterior.coords)) for polygon in intersection.geoms]
     intersection_multipolygon = MultiPolygon(intersection_cart)
-    KmlTester.create_file_multipolygon(intersection_multipolygon)
+    # KmlTester.create_file_multipolygon(intersection_multipolygon)
+
+    new_land = land_multipolygon.difference(intersection)
+    new_land_cart = [Polygon(Conversions.cartesian_list_to_gcs(polygon.exterior.coords)) for polygon in new_land.geoms]
+    new_land_multipolygon = MultiPolygon(new_land_cart)
+    KmlTester.create_file_multipolygon(new_land_multipolygon)
+
 
 test_rgt_and_mask_intersection()
