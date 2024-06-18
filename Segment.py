@@ -5,6 +5,7 @@ from enum import Enum
 class State(Enum):
     RGT = 0
     VEGETATION = 1
+    OCEAN = 2
 
 
 class Segment:

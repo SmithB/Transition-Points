@@ -2,7 +2,9 @@ import Intersections
 import KmlReader as Kr
 import Conversions
 import KmlTester
-from shapely import LineString, MultiPolygon, Polygon
+from shapely import LineString, MultiPolygon, Polygon, MultiLineString
+import PointerGenerator as Pg
+from Segment import Segment, State
 from shapely.ops import transform
 from functools import partial
 from pyproj import Geod
@@ -33,6 +35,10 @@ from pyproj import Geod
 
 # TODO find out where this code should go in main
 def test_rgt_and_mask_intersection():
+    orbit_gcs = Kr.get_coordinates_from_kml('/Users/pvelmuru/Desktop/IS2_RGT_0001_cycle12_23-Jun-2021.kml')
+    orbit_cart = Conversions.gcs_list_to_cartesian(orbit_gcs)
+    orbit_line = LineString(orbit_cart)
+
     mask_gcs_coords = Kr.parse_mask('/Users/pvelmuru/Desktop/snow_depth_mask.kml')
     mask_polygons_cart = [Polygon(Conversions.gcs_list_to_cartesian(coords)) for coords in mask_gcs_coords]
     mask_multipolygon = MultiPolygon(mask_polygons_cart)
@@ -50,7 +56,40 @@ def test_rgt_and_mask_intersection():
     new_land = land_multipolygon.difference(intersection)
     new_land_cart = [Polygon(Conversions.cartesian_list_to_gcs(polygon.exterior.coords)) for polygon in new_land.geoms]
     new_land_multipolygon = MultiPolygon(new_land_cart)
-    KmlTester.create_file_multipolygon(new_land_multipolygon)
 
+    segments = Pg.segmentation(mask_multipolygon, new_land_multipolygon, orbit_line)
+    mask_segments = [LineString(Conversions.cartesian_list_to_gcs(segment.line_string.coords)) for segment in segments if segment.state == State.RGT]
+    land_segments = [LineString(segment.line_string) for segment in segments if segment.state == State.VEGETATION]
+    ocean_segments = [LineString(Conversions.cartesian_list_to_gcs(segment.line_string.coords)) for segment in segments if segment.state == State.OCEAN]
+
+    # Multi Line String
+    if len(mask_segments) != 0:
+        print("MASK: ")
+        KmlTester.create_file_multiline(MultiLineString(mask_segments))
+    # if len(land_segments) != 0:
+    #     print(len(land_segments))
+    #     KmlTester.create_file_multiline(MultiLineString(land_segments))
+    if len(ocean_segments) != 0:
+        print("OCEAN: ")
+        # KmlTester.create_file_multiline(MultiLineString(ocean_segments))
 
 test_rgt_and_mask_intersection()
+
+# test_rgt_and_mask_intersection()
+
+# def test_get():
+#     # TEST
+#     orbit_gcs = Kr.get_coordinates_from_kml('/Users/pvelmuru/Desktop/IS2_RGT_0001_cycle12_23-Jun-2021.kml')
+#     # print(orbit_gcs)
+#     orbit_cart = Conversions.gcs_list_to_cartesian(orbit_gcs)
+#     orbit_line = LineString(orbit_cart)
+#
+#     mask_gcs = Kr.parse_mask('/Users/pvelmuru/Desktop/snow_depth_mask.kml')[1]
+#     # print(mask_gcs)
+#     mask_cart = Conversions.gcs_list_to_cartesian(mask_gcs)
+#     # print(mask_cart)
+#     mask_polygon = Polygon(mask_cart)
+#
+#     land_mask_gcs = Kr.p
+#
+#     return intersection_list_gcs

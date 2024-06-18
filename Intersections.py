@@ -4,21 +4,16 @@ import KmlReader as Kr
 import KmlTester
 
 
-#  Maybe use union to convert the mask multipolygon into a singular polygon
-
-
 def find_intersections(geometry1, geometry2):
-    # print("Issue ", geometry2)
-    # print(geometry1)
+    # TODO remove function?
     intersection = geometry1.intersection(geometry2)
-    # print("Intersection: ", intersection)
     return intersection
 
 
 def modify_land_mask(land_mask, rgt_mask):
     """
     This functions generates a new land mask MultiPolygon that no longer includes any overlap with
-    the rgt mask area
+    the rgt mask area ???CARTESIAN???
     :param land_mask: MultiPolygon mask that represent most land
     :param rgt_mask: MultiPolygon or Polygon that needs rgt tracking
     :return: A Multipolygon that is the new land mask that takes into account rgt mask
@@ -34,16 +29,16 @@ def modify_land_mask(land_mask, rgt_mask):
 def test_get():
     # TEST
     orbit_gcs = Kr.get_coordinates_from_kml('/Users/pvelmuru/Desktop/IS2_RGT_0001_cycle12_23-Jun-2021.kml')
-    # print(orbit_gcs)
     orbit_cart = Conversions.gcs_list_to_cartesian(orbit_gcs)
     orbit_line = LineString(orbit_cart)
 
     mask_gcs = Kr.parse_mask('/Users/pvelmuru/Desktop/snow_depth_mask.kml')[1]
-    # print(mask_gcs)
     mask_cart = Conversions.gcs_list_to_cartesian(mask_gcs)
-    # print(mask_cart)
     mask_polygon = Polygon(mask_cart)
-    # print(orbit_line)
+
+    land_mask = Kr.parse_mask('/Users/pvelmuru/PycharmProjects/Transistion Points/assets/land_mask.kml')
+
+
     intersection = find_intersections(orbit_line, mask_polygon)
     # print(list(intersection.geoms))
 
@@ -76,3 +71,15 @@ def test_rgt_and_mask_intersection():
 #
 # print(x)
 # print(find_intersections(a, b))
+
+
+# DOES not work
+def get_ocean_mask():
+    ocean_mask = Polygon.from_bounds(-180,-90,180,90)
+    land_gcs_coords = Kr.parse_mask('/Users/pvelmuru/PycharmProjects/Transistion Points/assets/land_mask.kml')
+    land_gcs_coords = [Polygon(Conversions.gcs_list_to_cartesian(coordinates)) for coordinates in land_gcs_coords]
+    land_multipolygon = MultiPolygon(land_gcs_coords)
+    intersection = ocean_mask.difference(land_multipolygon)
+    KmlTester.create_file_multipolygon(intersection)
+
+get_ocean_mask()
