@@ -1,3 +1,5 @@
+import shapely
+
 import Intersections
 import KmlReader as Kr
 import Conversions
@@ -41,37 +43,57 @@ def test_rgt_and_mask_intersection():
 
     mask_gcs_coords = Kr.parse_mask('/Users/pvelmuru/Desktop/snow_depth_mask.kml')
     mask_polygons_cart = [Polygon(Conversions.gcs_list_to_cartesian(coords)) for coords in mask_gcs_coords]
-    mask_multipolygon = MultiPolygon(mask_polygons_cart)
+    mask_multipolygon = shapely.make_valid(MultiPolygon(mask_polygons_cart))
 
     land_gcs_coords = Kr.parse_mask('/Users/pvelmuru/PycharmProjects/Transistion Points//assets/land_mask.kml')
     land_polygon_cart = [Polygon(Conversions.gcs_list_to_cartesian(coordinates)) for coordinates in land_gcs_coords]
-    land_multipolygon = MultiPolygon(land_polygon_cart)
+    land_multipolygon = shapely.make_valid(MultiPolygon(land_polygon_cart))
 
     # Added in Intersections
-    intersection = mask_multipolygon.intersection(land_multipolygon)
-    intersection_cart = [Polygon(Conversions.cartesian_list_to_gcs(polygon.exterior.coords)) for polygon in intersection.geoms]
-    intersection_multipolygon = MultiPolygon(intersection_cart)
+    # intersection = mask_multipolygon.intersection(land_multipolygon)
+    # intersection_cart = [Polygon(Conversions.cartesian_list_to_gcs(polygon.exterior.coords)) for polygon in intersection.geoms]
+    # intersection_multipolygon = MultiPolygon(intersection_cart)
     # KmlTester.create_file_multipolygon(intersection_multipolygon)
+    new_land_multipolygon = Intersections.modify_land_mask(land_multipolygon, mask_multipolygon) # RETURNS back GCS
+    new_land_cart = [Polygon(Conversions.gcs_list_to_cartesian(polygon.exterior.coords))
+                     for polygon in new_land_multipolygon.geoms]
+    new_land_final_multi = shapely.make_valid(MultiPolygon(new_land_cart))
+    new_land_final_multi = shapely.make_valid(new_land_final_multi)
 
-    new_land = land_multipolygon.difference(intersection)
-    new_land_cart = [Polygon(Conversions.cartesian_list_to_gcs(polygon.exterior.coords)) for polygon in new_land.geoms]
-    new_land_multipolygon = MultiPolygon(new_land_cart)
+    # land_rgt_intersec(new_land_final_multi, orbit_line)
 
-    segments = Pg.segmentation(mask_multipolygon, new_land_multipolygon, orbit_line)
-    mask_segments = [LineString(Conversions.cartesian_list_to_gcs(segment.line_string.coords)) for segment in segments if segment.state == State.RGT]
-    land_segments = [LineString(segment.line_string) for segment in segments if segment.state == State.VEGETATION]
-    ocean_segments = [LineString(Conversions.cartesian_list_to_gcs(segment.line_string.coords)) for segment in segments if segment.state == State.OCEAN]
+    segments = Pg.segmentation(mask_multipolygon, new_land_final_multi, orbit_line)
+
+    mask_segments = [LineString(Conversions.cartesian_list_to_gcs(segment.line_string.coords))
+                     for segment in segments if segment.state == State.RGT and
+                     orbit_line.overlaps(segment.line_string)]
+
+    land_segments = [LineString(Conversions.cartesian_list_to_gcs(segment.line_string.coords))
+                     for segment in segments if segment.state == State.VEGETATION and
+                     orbit_line.overlaps(segment.line_string)]
+
+    ocean_segments = [LineString(Conversions.cartesian_list_to_gcs(segment.line_string.coords))
+                      for segment in segments if segment.state == State.OCEAN and
+                      orbit_line.overlaps(segment.line_string)]
 
     # Multi Line String
     if len(mask_segments) != 0:
         print("MASK: ")
         KmlTester.create_file_multiline(MultiLineString(mask_segments))
-    # if len(land_segments) != 0:
-    #     print(len(land_segments))
-    #     KmlTester.create_file_multiline(MultiLineString(land_segments))
+    if len(land_segments) != 0:
+        print("LAND: ")
+        # print(list(land_segments[0].coords))
+        KmlTester.create_file_multiline(MultiLineString(land_segments))
     if len(ocean_segments) != 0:
         print("OCEAN: ")
-        # KmlTester.create_file_multiline(MultiLineString(ocean_segments))
+        KmlTester.create_file_multiline(MultiLineString(ocean_segments))
+
+
+def land_rgt_intersec(land_mask, rgt):
+    segments = shapely.make_valid(rgt.intersection(land_mask))
+    segments = [shapely.make_valid(LineString(Conversions.cartesian_list_to_gcs(segment.coords))) for segment in segments.geoms if rgt.overlaps(segment)]
+    KmlTester.create_file_multiline(shapely.make_valid(MultiLineString(segments)))
+
 
 test_rgt_and_mask_intersection()
 

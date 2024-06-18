@@ -12,8 +12,17 @@ MIN_TRANSITION_DIST = 1100  # Kilometers
 
 
 def segmentation(rgt_mask, land_mask, rgt):  # Uses modified land Mask
+    """
+    Segments the given RGT into sections of
+    veg pointing, rgt pointing, and ocean/polar region rgt pointing
+    All must use CARTESIAN coordinates
+    :param rgt_mask: Polygon/Multipolygon representing the rgt mask
+    :param land_mask: Multipolygon representing USABLE land regions
+    (shares no overlap with rgt_mask)
+    :param rgt: LineString representing the RGT line
+    :return: List of Segment objects that represents the rgt broken up
+    """
     segments = []
-    # everything needs to CARTESIAN
 
     def add_segment(intersections, state):
         if type(intersections) is LineString:
@@ -32,8 +41,9 @@ def segmentation(rgt_mask, land_mask, rgt):  # Uses modified land Mask
     land_intersections = Intersections.find_intersections(rgt, land_mask)
     add_segment(land_intersections, State.VEGETATION)
 
-    ocean_intersections = rgt.difference(rgt_mask)
-    ocean_intersections = ocean_intersections.difference(land_mask)
+    ocean_intersections = rgt.difference(rgt_intersections)
+    ocean_intersections = ocean_intersections.difference(land_intersections)
+    print(ocean_intersections)
     add_segment(ocean_intersections, State.OCEAN)
     return segments
 
