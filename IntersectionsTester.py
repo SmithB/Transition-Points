@@ -37,7 +37,8 @@ from pyproj import Geod
 
 # TODO find out where this code should go in main
 def test_rgt_and_mask_intersection():
-    orbit_gcs = Kr.get_coordinates_from_kml('/Users/pvelmuru/Desktop/IS2_RGT_0001_cycle12_23-Jun-2021.kml')
+    # orbit_gcs = Kr.get_coordinates_from_kml('/Users/pvelmuru/Desktop/IS2_RGT_0001_cycle12_23-Jun-2021.kml')
+    orbit_gcs = Kr.get_coordinates_from_kml('/Users/pvelmuru/Downloads/IS2_RGTs_cycle12_date_time/IS2_RGT_0017_cycle12_24-Jun-2021.kml')
     orbit_cart = Conversions.gcs_list_to_cartesian(orbit_gcs)
     orbit_line = LineString(orbit_cart)
     print("test: ", shapely.covers(orbit_line, orbit_line))
@@ -64,7 +65,7 @@ def test_rgt_and_mask_intersection():
     # land_rgt_intersec(new_land_final_multi, orbit_line)
 
     segments = Pg.segmentation(mask_multipolygon, new_land_final_multi, orbit_line)
-
+    # Leave as Segment objects when doing actually, needs length stuff
     mask_segments = [LineString(Conversions.cartesian_list_to_gcs(segment.line_string.coords))
                      for segment in segments if segment.state == State.RGT]# and
                      #orbit_line.overlaps(segment.line_string)]
@@ -74,9 +75,8 @@ def test_rgt_and_mask_intersection():
                      #orbit_line.overlaps(segment.line_string)]
 
     ocean_segments = [LineString(Conversions.cartesian_list_to_gcs(segment.line_string.coords))
-                      for segment in segments if segment.state == State.OCEAN ]#and
-                      #orbit_line.contains_properly(segment.line_string)]
-    print(" segments: ", len(mask_segments) + len(land_segments) + len(ocean_segments))
+                      for segment in segments if segment.state == State.OCEAN and
+                      (segment.line_string).dwithin(orbit_line, 1e-8)]
 
     # Multi Line String
     if len(mask_segments) != 0:
@@ -89,6 +89,13 @@ def test_rgt_and_mask_intersection():
     if len(ocean_segments) != 0:
         print("OCEAN: ")
         KmlTester.create_file_multiline(MultiLineString(ocean_segments))
+    print(len(mask_segments))
+    print(Conversions.get_geodesic_length(mask_segments[0]))
+    print(land_segments[1].length)
+    print(mask_segments[0].length)
+    print(len(land_segments))
+    print(len(ocean_segments))
+    print(len(segments))
 
 
 def land_rgt_intersec(land_mask, rgt):
