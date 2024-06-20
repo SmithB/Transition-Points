@@ -54,21 +54,10 @@ def segmentation(rgt_mask, land_mask, rgt):  # Uses modified land Mask
                     segments.append(segment)
 
     rgt_intersections = Intersections.find_intersections(rgt, rgt_mask)
-    print(rgt_intersections)
-    if isinstance(rgt_intersections, MultiLineString):
-        print(("attempt"))
-        rgt_intersections = MultiLineString([segment for segment in rgt_intersections.geoms if segment.dwithin(rgt, 1e-8)])
-        print("RGT Intersec: ", rgt_intersections)
-    elif isinstance(rgt_intersections, LineString):
-        rgt_intersections = LineString([segment for segment in rgt_intersections.geoms if segment.dwithin(rgt, 1e-8)])
     add_segment(rgt_intersections, State.RGT)
     rgt_intersections = MultiLineString([segment.line_string for segment in segments if segment.state == State.RGT])
 
     land_intersections = Intersections.find_intersections(rgt, land_mask)
-    if isinstance(land_intersections, MultiLineString):
-        land_intersections = MultiLineString([segment for segment in rgt_intersections.geoms if segment.dwithin(rgt, 1e-8)])
-    elif isinstance(land_intersections, LineString):
-        land_intersections = LineString([segment for segment in rgt_intersections.geoms if segment.dwithin(rgt, 1e-8)])
     add_segment(land_intersections, State.VEGETATION)
     land_intersections = MultiLineString([segment.line_string for segment in segments if segment.state == State.VEGETATION])
 
