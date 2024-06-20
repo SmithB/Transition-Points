@@ -40,12 +40,13 @@ def test_rgt_and_mask_intersection():
     orbit_gcs = Kr.get_coordinates_from_kml('/Users/pvelmuru/Desktop/IS2_RGT_0001_cycle12_23-Jun-2021.kml')
     orbit_cart = Conversions.gcs_list_to_cartesian(orbit_gcs)
     orbit_line = LineString(orbit_cart)
+    print("test: ", shapely.covers(orbit_line, orbit_line))
 
     mask_gcs_coords = Kr.parse_mask('/Users/pvelmuru/Desktop/snow_depth_mask.kml')
     mask_polygons_cart = [Polygon(Conversions.gcs_list_to_cartesian(coords)) for coords in mask_gcs_coords]
     mask_multipolygon = shapely.make_valid(MultiPolygon(mask_polygons_cart))
 
-    land_gcs_coords = Kr.parse_mask('/Users/pvelmuru/PycharmProjects/Transistion Points//assets/land_mask.kml')
+    land_gcs_coords = Kr.parse_mask('/Users/pvelmuru/PycharmProjects/Transistion Points/assets/land_mask.kml')
     land_polygon_cart = [Polygon(Conversions.gcs_list_to_cartesian(coordinates)) for coordinates in land_gcs_coords]
     land_multipolygon = shapely.make_valid(MultiPolygon(land_polygon_cart))
 
@@ -65,16 +66,17 @@ def test_rgt_and_mask_intersection():
     segments = Pg.segmentation(mask_multipolygon, new_land_final_multi, orbit_line)
 
     mask_segments = [LineString(Conversions.cartesian_list_to_gcs(segment.line_string.coords))
-                     for segment in segments if segment.state == State.RGT and
-                     orbit_line.overlaps(segment.line_string)]
+                     for segment in segments if segment.state == State.RGT]# and
+                     #orbit_line.overlaps(segment.line_string)]
 
     land_segments = [LineString(Conversions.cartesian_list_to_gcs(segment.line_string.coords))
-                     for segment in segments if segment.state == State.VEGETATION and
-                     orbit_line.overlaps(segment.line_string)]
+                     for segment in segments if segment.state == State.VEGETATION]# and
+                     #orbit_line.overlaps(segment.line_string)]
 
     ocean_segments = [LineString(Conversions.cartesian_list_to_gcs(segment.line_string.coords))
-                      for segment in segments if segment.state == State.OCEAN and
-                      orbit_line.overlaps(segment.line_string)]
+                      for segment in segments if segment.state == State.OCEAN ]#and
+                      #orbit_line.contains_properly(segment.line_string)]
+    print(" segments: ", len(mask_segments) + len(land_segments) + len(ocean_segments))
 
     # Multi Line String
     if len(mask_segments) != 0:
