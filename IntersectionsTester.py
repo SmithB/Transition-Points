@@ -41,6 +41,7 @@ def test_rgt_and_mask_intersection():
     orbit_gcs = Kr.get_coordinates_from_kml('/Users/pvelmuru/Downloads/IS2_RGTs_cycle12_date_time/IS2_RGT_0017_cycle12_24-Jun-2021.kml')
     orbit_cart = Conversions.gcs_list_to_cartesian(orbit_gcs)
     orbit_line = LineString(orbit_cart)
+    print("test: ", shapely.covers(orbit_line, orbit_line))
 
     mask_gcs_coords = Kr.parse_mask('/Users/pvelmuru/Desktop/snow_depth_mask.kml')
     mask_polygons_cart = [Polygon(Conversions.gcs_list_to_cartesian(coords)) for coords in mask_gcs_coords]
@@ -66,12 +67,12 @@ def test_rgt_and_mask_intersection():
     segments = Pg.segmentation(mask_multipolygon, new_land_final_multi, orbit_line)
     # Leave as Segment objects when doing actually, needs length stuff
     mask_segments = [LineString(Conversions.cartesian_list_to_gcs(segment.line_string.coords))
-                     for segment in segments if segment.state == State.RGT and
-                     orbit_line.overlaps(segment.line_string)]
+                     for segment in segments if segment.state == State.RGT]# and
+                     #orbit_line.overlaps(segment.line_string)]
 
     land_segments = [LineString(Conversions.cartesian_list_to_gcs(segment.line_string.coords))
-                     for segment in segments if segment.state == State.VEGETATION and
-                     orbit_line.overlaps(segment.line_string)]
+                     for segment in segments if segment.state == State.VEGETATION]# and
+                     #orbit_line.overlaps(segment.line_string)]
 
     ocean_segments = [LineString(Conversions.cartesian_list_to_gcs(segment.line_string.coords))
                       for segment in segments if segment.state == State.OCEAN and
