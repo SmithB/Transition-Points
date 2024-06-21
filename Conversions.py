@@ -61,17 +61,3 @@ def get_geodesic_length(line_obj):
     """
     geod = Geod(ellps="WGS84")
     return geod.geometry_length(line_obj) / 1000
-
-# print(gcs_to_cartesian(90, 180))
-
-# x = 4328369.131354082
-# y = 4997071.061740645
-#
-# # WGS84 is EPSG:4326
-
-# print(transformer.transform(x, y))
-#
-# lat = 40.89638903854909
-# long = 38.88240146006508
-
-# print(other_trans.transform(lat, long))
