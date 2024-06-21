@@ -1,6 +1,6 @@
 from pyproj import Transformer, Geod
 
-
+# Transformer objects used to convert units
 to_gcs_transform = Transformer.from_crs("EPSG:3857", "EPSG:4326")
 to_cartesian_transform = Transformer.from_crs("EPSG:4326", "EPSG:3857")
 
@@ -16,8 +16,6 @@ def gcs_list_to_cartesian(gcs_list):
         cartesian_list.append(gcs_to_cartesian(coordinates[1], coordinates[0]))
     return cartesian_list
 
-
-#  check if this works
 
 def cartesian_list_to_gcs(cartesian_list):
     """

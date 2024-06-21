@@ -92,6 +92,20 @@ def sort_segments_by_coordinates(segments, starting_coordinate):
 
 
 # TODO Add warning somehow to remove
+def remove_segments_under_thresh(segments):
+    """
+
+    :param segments:
+    :return:
+    """
+    clean_segments = []
+
+    for segment in segments:
+        if segment.length >= MIN_TRANSITION_DIST:
+            clean_segments.append(segment)
+
+    return clean_segments
+
 
 def remove_insignificant_segments(segments):
     print(type(segments))
