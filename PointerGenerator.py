@@ -100,11 +100,8 @@ def sort_segments_by_coordinates(segments, starting_coordinate):
         index = -1
         min_distance = float('inf')
         for i, segment in enumerate(segments):
-            print(i)
             line = segment.line_string
             start_dist = Point(current_coordinate).distance(Point(line.coords[0][0], line.coords[0][1]))
-            print(segment.line_string.coords.xy)
-            print("current:", current_coordinate)
             end_dist = Point(current_coordinate).distance(Point(line.coords[-1][0], line.coords[-1][1]))
 
             if start_dist < min_distance:
@@ -115,16 +112,13 @@ def sort_segments_by_coordinates(segments, starting_coordinate):
                 min_distance = end_dist
                 next_line = LineString(line.coords[::-1])
                 next_segment = Segment(next_line, segment.state, segment.length)
-                reverse = True
                 index = i
         if next_segment:
-            print('append: ', next_segment.length, min_distance)
             current_coordinate = next_segment.line_string.coords[-1]
             sorted_segments.append(next_segment)
             segments.pop(index)
         else:
             break
-    print(sorted_segments)
     return sorted_segments
 
 
