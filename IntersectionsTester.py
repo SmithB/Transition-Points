@@ -8,8 +8,6 @@ import PointerGenerator as Pg
 from Segment import Segment, State
 
 
-# Next Test
-
 # TODO find out where this code should go in main
 def test_rgt_and_mask_intersection():
     # orbit_gcs = Kr.get_coordinates_from_kml('/Users/pvelmuru/Desktop/IS2_RGT_0001_cycle12_23-Jun-2021.kml')
@@ -26,7 +24,7 @@ def test_rgt_and_mask_intersection():
     land_multipolygon = shapely.make_valid(MultiPolygon(land_polygon_cart))
 
     # Added in Intersections
-    new_land_multipolygon = Intersections.modify_land_mask(land_multipolygon, mask_multipolygon) # RETURNS back GCS
+    new_land_multipolygon = Intersections.modify_land_mask(land_multipolygon, mask_multipolygon)  # RETURNS back GCS
     new_land_cart = [Polygon(Conversions.gcs_list_to_cartesian(polygon.exterior.coords))
                      for polygon in new_land_multipolygon.geoms]
     new_land_final_multi = shapely.make_valid(MultiPolygon(new_land_cart))
@@ -58,9 +56,12 @@ def test_rgt_and_mask_intersection():
         print(f'{segment.state}: {segment.length}')
     segments_clean = Pg.merge_touching_segments(segments)
     segments_clean = Pg.remove_insignificant_segments(segments_clean)
+    segments_clean = Pg.remove_segments_under_thresh(segments_clean)
+    segments_clean = Pg.sort_segments_by_coordinates(segments_clean,  Conversions.gcs_to_cartesian(0.021, -18.04))
     for segment in segments_clean:
         print(f'{segment.state}: {segment.length}')
     print(len(segments_clean))
+    Pg.generate_ideal_points(segments_clean)
 
     # ocean_segments = [LineString(Conversions.cartesian_list_to_gcs(segment.line_string.coords))
     #                   for segment in segments_clean if segment.state == State.OCEAN]

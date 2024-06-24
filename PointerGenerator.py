@@ -1,7 +1,7 @@
 from Segment import Segment, State
 import Conversions
 import Intersections
-from shapely import LineString, MultiLineString
+from shapely import LineString, MultiLineString, Point
 
 
 MIN_TRANSITION_DIST = 550  # Kilometers
@@ -9,8 +9,9 @@ MIN_TRANSITION_DIST = 550  # Kilometers
 
 def segmentation(rgt_mask, land_mask, rgt):  # Uses modified land Mask
     """
-    Segments the given RGT into sections of
-    veg pointing, rgt pointing, and ocean/polar region rgt pointing
+    Segments the given RGT into sections of veg pointing, rgt pointing,
+    and ocean/polar region rgt pointing
+
     All must use CARTESIAN coordinates
     :param rgt_mask: Polygon/Multipolygon representing the rgt mask
     :param land_mask: Multipolygon representing USABLE land regions
@@ -37,7 +38,6 @@ def segmentation(rgt_mask, land_mask, rgt):  # Uses modified land Mask
                 else:
                     intersection_gcs = LineString(Conversions.cartesian_list_to_gcs(intersection.coords))
                     length = Conversions.get_geodesic_length(intersection_gcs)
-                    print("length: ", length)
                     segment = Segment(intersection, state, length)
                     segments.append(segment)
 
@@ -47,7 +47,8 @@ def segmentation(rgt_mask, land_mask, rgt):  # Uses modified land Mask
 
     land_intersections = Intersections.find_intersections(rgt, land_mask)
     add_segment(land_intersections, State.VEGETATION)
-    land_intersections = MultiLineString([segment.line_string for segment in segments if segment.state == State.VEGETATION])
+    land_intersections = MultiLineString([segment.line_string for segment in segments if
+                                          segment.state == State.VEGETATION])
 
     ocean_intersections = rgt.difference(rgt_intersections)
     ocean_intersections = ocean_intersections.difference(land_intersections)
@@ -59,6 +60,11 @@ def segmentation(rgt_mask, land_mask, rgt):  # Uses modified land Mask
 
 
 def merge_touching_segments(segments):
+    """
+    Merges line segments that should be connected but were split incorrectly by shapely
+    :param segments: list of Segments
+    :return: cleaned list of Segments
+    """
     mask_segments = [segment for segment in segments if segment.state == State.RGT]
     land_segments = [segment for segment in segments if segment.state == State.VEGETATION]
     ocean_segments = [segment for segment in segments if segment.state == State.OCEAN]
@@ -78,7 +84,14 @@ def merge_touching_segments(segments):
 
 # TODO work on it
 
+
 def sort_segments_by_coordinates(segments, starting_coordinate):
+    """
+    Sorts segments in order starting from the given starting coordinate
+    :param segments: list of Segment objects
+    :param starting_coordinate: Tuple of (x, y) Cartesian Coordinates
+    :return: list of sorted Segment Objects
+    """
     sorted_segments = []
     current_coordinate = starting_coordinate
 
@@ -86,17 +99,41 @@ def sort_segments_by_coordinates(segments, starting_coordinate):
         next_segment = None
         index = -1
         min_distance = float('inf')
-        # for i, segment in enumerate(segments):
+        for i, segment in enumerate(segments):
+            print(i)
+            line = segment.line_string
+            start_dist = Point(current_coordinate).distance(Point(line.coords[0][0], line.coords[0][1]))
+            print(segment.line_string.coords.xy)
+            print("current:", current_coordinate)
+            end_dist = Point(current_coordinate).distance(Point(line.coords[-1][0], line.coords[-1][1]))
 
+            if start_dist < min_distance:
+                min_distance = start_dist
+                next_segment = segment
+                index = i
+            if end_dist < min_distance:
+                min_distance = end_dist
+                next_line = LineString(line.coords[::-1])
+                next_segment = Segment(next_line, segment.state, segment.length)
+                reverse = True
+                index = i
+        if next_segment:
+            print('append: ', next_segment.length, min_distance)
+            current_coordinate = next_segment.line_string.coords[-1]
+            sorted_segments.append(next_segment)
+            segments.pop(index)
+        else:
+            break
+    print(sorted_segments)
     return sorted_segments
 
 
-# TODO Add warning somehow to remove
+# TODO Add warning somehow when removing segment
 def remove_segments_under_thresh(segments):
     """
-
-    :param segments:
-    :return:
+    Removes line segments that are under the minimum distance threshold
+    :param segments: list of Segments
+    :return: clean list of Segments
     """
     clean_segments = []
 
@@ -108,9 +145,6 @@ def remove_segments_under_thresh(segments):
 
 
 def remove_insignificant_segments(segments):
-    print(type(segments))
-    print(type(segments[0]))
-    print((segments[0]))
     """
     Removes extraneous segments that are inconsequential
     :param segments: list of all Segments
@@ -120,5 +154,8 @@ def remove_insignificant_segments(segments):
     return clean_segments
 
 
-def generate_points(line_segments, curr_transition_points):
-    print('No clue for now')
+def generate_ideal_points(segments):
+    for segment in segments:
+        x = segment.line_string.coords[-1][0]
+        y = segment.line_string.coords[-1][1]
+        print(f'{Conversions.cartesian_to_gcs(x, y)[0]}, {Conversions.cartesian_to_gcs(x, y)[1]}')

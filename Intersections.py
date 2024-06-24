@@ -1,7 +1,5 @@
 from shapely import LineString, Polygon, MultiPolygon
-import Conversions # Only for testing
-import KmlReader as Kr
-import KmlTester
+import Conversions
 
 
 def find_intersections(geometry1, geometry2):
