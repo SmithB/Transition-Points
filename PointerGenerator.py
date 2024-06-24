@@ -148,6 +148,11 @@ def remove_insignificant_segments(segments):
     return clean_segments
 
 
+# TODO create this function
+def modify_overlaps(segments):
+    print('todo')
+
+
 def generate_ideal_points(segments):
     for segment in segments:
         x = segment.line_string.coords[-1][0]

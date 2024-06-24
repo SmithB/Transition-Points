@@ -2,10 +2,11 @@ import Intersections
 import KmlReader as Kr
 import Conversions
 import KmlTester
-from shapely import LineString, MultiPolygon, Polygon, MultiLineString
+from shapely import LineString, MultiPolygon, Polygon, MultiLineString, Point
 import shapely
 import PointerGenerator as Pg
 from Segment import Segment, State
+import CsvHandler as Ch
 
 
 # TODO find out where this code should go in main
@@ -58,10 +59,39 @@ def test_rgt_and_mask_intersection():
     segments_clean = Pg.remove_insignificant_segments(segments_clean)
     segments_clean = Pg.remove_segments_under_thresh(segments_clean)
     segments_clean = Pg.sort_segments_by_coordinates(segments_clean,  Conversions.gcs_to_cartesian(0.021, -18.04))
+    print("new")
     for segment in segments_clean:
         print(f'{segment.state}: {segment.length}')
     print(len(segments_clean))
     Pg.generate_ideal_points(segments_clean)
+
+    points_dict = {}
+    for i in range(1, 1388):
+        points_dict[i] = []
+
+    points_dict = Ch.read_csv('/Users/pvelmuru/PycharmProjects/Transistion Points/RGT_transition_locations_V2.0 1.csv',
+                              points_dict)
+    for point in points_dict[17]:
+        print(f'lat: {point.latitude} long: {point.longitude}')
+        temp_point = Point(Conversions.gcs_to_cartesian(point.latitude, point.longitude))
+        # print(segment.line_string.coords.xy)
+        # print(temp_point.coords.xy)
+        i = 0
+        for segment in segments_clean:
+            print('distance: ', temp_point.distance(segment.line_string))
+            if shapely.dwithin(temp_point, segment.line_string, 600):  # 600 works well, larger margin than it should be though
+                print(i)
+                segment.points.append(point)
+                print(point.longitude)
+                break
+            i += 1
+
+    line = LineString([(0,0), (18.98, 0)])
+    point = Point(0,0)
+    point2 = Point(18.98, 0)
+    print(point.distance(point2))
+    print(Conversions.get_geodesic_length(line))
+
 
     # ocean_segments = [LineString(Conversions.cartesian_list_to_gcs(segment.line_string.coords))
     #                   for segment in segments_clean if segment.state == State.OCEAN]

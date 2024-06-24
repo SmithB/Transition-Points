@@ -19,3 +19,4 @@ class Segment:
         self.line_string = line_string
         self.state = state
         self.length = length
+        self.points = []
