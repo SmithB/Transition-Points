@@ -3,6 +3,12 @@ from Point import Point, TypePoint
 
 
 def read_csv(filename, points_dict):
+    """
+    Reads file and fills up points_dict with Point objects
+    :param filename: Csv file names
+    :param points_dict: dictionary to fill with Point objects
+    :return: populated points_dict
+    """
     with open(filename, newline='') as csvfile:
         reader = csv.reader(csvfile, delimiter=',')
         next(reader)  # Skips headers
@@ -23,6 +29,11 @@ def read_csv(filename, points_dict):
 
 
 def write_csv(filename, points_dict):
+    """
+
+    :param filename: file name to write to
+    :param points_dict: dictionary to get information from
+    """
     with open(filename, 'w', newline='') as csvfile:
         writer = csv.writer(csvfile, delimiter=',')
         writer.writerow(['rgt', 'trans_type', 'lat', 'lon'])

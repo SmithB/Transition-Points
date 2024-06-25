@@ -32,6 +32,12 @@ def test_rgt_and_mask_intersection():
     new_land_final_multi = shapely.make_valid(new_land_final_multi)
 
     segments = Pg.segmentation(mask_multipolygon, new_land_final_multi, orbit_line)
+
+    segments_clean = Pg.merge_touching_segments(segments)
+    segments_clean = Pg.remove_insignificant_segments(segments_clean)
+    segments_clean = Pg.remove_segments_under_thresh(segments_clean)
+    segments = Pg.sort_segments_by_coordinates(segments_clean, Conversions.gcs_to_cartesian(0.021, -18.04))
+
     # Leave as Segment objects when doing actually, needs length stuff
     mask_segments = [LineString(Conversions.cartesian_list_to_gcs(segment.line_string.coords))
                      for segment in segments if segment.state == State.RGT]
@@ -53,10 +59,7 @@ def test_rgt_and_mask_intersection():
         print("OCEAN: ")
         KmlTester.create_file_multiline(MultiLineString(ocean_segments))
 
-    segments_clean = Pg.merge_touching_segments(segments)
-    segments_clean = Pg.remove_insignificant_segments(segments_clean)
-    segments_clean = Pg.remove_segments_under_thresh(segments_clean)
-    segments_clean = Pg.sort_segments_by_coordinates(segments_clean,  Conversions.gcs_to_cartesian(0.021, -18.04))
+
     print("new")
     for segment in segments_clean:
         print(f'{segment.state}: {segment.length}')

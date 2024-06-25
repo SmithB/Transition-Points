@@ -60,9 +60,10 @@ def segmentation(rgt_mask, land_mask, rgt):  # Uses modified land Mask
     return segments
 
 
+# TODO look into implementing for all segments -- might not be necessary
 def merge_touching_segments(segments):
     """
-    Merges line segments that should be connected but were split incorrectly by shapely
+    Merges ocean line segments that should be connected but were split incorrectly by shapely
     :param segments: list of Segments
     :return: cleaned list of Segments
     """
@@ -82,8 +83,6 @@ def merge_touching_segments(segments):
             ocean_segments.pop(i + 1)
         i += 1
     return mask_segments + land_segments + ocean_segments
-
-# TODO work on it
 
 
 def sort_segments_by_coordinates(segments, starting_coordinate):
@@ -139,6 +138,7 @@ def remove_segments_under_thresh(segments):
     return clean_segments
 
 
+# TODO make sure that segment is overlapping another segment before filtering it out
 def remove_insignificant_segments(segments):
     """
     Removes extraneous segments that are inconsequential
@@ -149,9 +149,25 @@ def remove_insignificant_segments(segments):
     return clean_segments
 
 
-# TODO create this function
-def modify_overlaps(segments):
+# TODO create this function maybe
+# Overlap is minimal, test more and see if the issue really needs to be taken care of or it is fine
+def modify_overlaps(segments):  # This might have to be called after remove_insignificant_segments(segments)
+
     print('todo')
+
+
+def combine_segments(segment1: Segment, segment2: Segment, state: State):
+    """
+    Merges two given segments with specified state
+    :param segment1: Segment object
+    :param segment2: Segment object
+    :param state: Specified State
+    :return: merge segment
+    """
+    new_line = shapely.line_merge(segment1.line_string, segment2.line_string)
+    new_length = segment1.length + segment2.length
+    new_segment = Segment(new_line, state, new_length)
+    return new_segment
 
 
 def generate_ideal_points(segments):
