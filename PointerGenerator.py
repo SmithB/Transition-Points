@@ -2,6 +2,7 @@ from Segment import Segment, State
 import Conversions
 import Intersections
 from shapely import LineString, MultiLineString, Point
+import shapely
 
 
 MIN_TRANSITION_DIST = 550  # Kilometers
@@ -158,3 +159,20 @@ def generate_ideal_points(segments):
         x = segment.line_string.coords[-1][0]
         y = segment.line_string.coords[-1][1]
         print(f'{Conversions.cartesian_to_gcs(x, y)[0]}, {Conversions.cartesian_to_gcs(x, y)[1]}')
+
+
+def assign_points(rgt, points_dict, segments):
+    """
+    Assigns unmodified transition points to the given segment based on it points are a segment
+    :param rgt: an int representing the rgt to get transition points from
+    :param points_dict: dictionary of (key = rgt): (vals = list of transition points (Points Objects))
+    :param segments: list of Segment objects
+    :return: list of Segment objects with transition points assigned to them
+    """
+    for point in points_dict[rgt]:
+        temp_point = Point(Conversions.gcs_to_cartesian(point.latitude, point.longitude))
+        for segment in segments:
+            if shapely.dwithin(temp_point, segment.line_string, 10000):  # 10000 is roughly 10 km
+                segment.points.append(point)
+                break
+    return segments

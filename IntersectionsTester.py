@@ -53,8 +53,6 @@ def test_rgt_and_mask_intersection():
         print("OCEAN: ")
         KmlTester.create_file_multiline(MultiLineString(ocean_segments))
 
-    for segment in segments:
-        print(f'{segment.state}: {segment.length}')
     segments_clean = Pg.merge_touching_segments(segments)
     segments_clean = Pg.remove_insignificant_segments(segments_clean)
     segments_clean = Pg.remove_segments_under_thresh(segments_clean)
@@ -71,12 +69,7 @@ def test_rgt_and_mask_intersection():
 
     points_dict = Ch.read_csv('/Users/pvelmuru/PycharmProjects/Transistion Points/RGT_transition_locations_V2.0 1.csv',
                               points_dict)
-    for point in points_dict[17]:
-        temp_point = Point(Conversions.gcs_to_cartesian(point.latitude, point.longitude))
-        for segment in segments_clean:
-            if shapely.dwithin(temp_point, segment.line_string, 10000):  # 10000 is roughly 10 km
-                segment.points.append(point)
-                break
+    Pg.assign_points(17, points_dict, segments_clean)
 
 
     # ocean_segments = [LineString(Conversions.cartesian_list_to_gcs(segment.line_string.coords))
