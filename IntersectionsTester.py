@@ -72,25 +72,11 @@ def test_rgt_and_mask_intersection():
     points_dict = Ch.read_csv('/Users/pvelmuru/PycharmProjects/Transistion Points/RGT_transition_locations_V2.0 1.csv',
                               points_dict)
     for point in points_dict[17]:
-        print(f'lat: {point.latitude} long: {point.longitude}')
         temp_point = Point(Conversions.gcs_to_cartesian(point.latitude, point.longitude))
-        # print(segment.line_string.coords.xy)
-        # print(temp_point.coords.xy)
-        i = 0
         for segment in segments_clean:
-            print('distance: ', temp_point.distance(segment.line_string))
-            if shapely.dwithin(temp_point, segment.line_string, 600):  # 600 works well, larger margin than it should be though
-                print(i)
+            if shapely.dwithin(temp_point, segment.line_string, 10000):  # 10000 is roughly 10 km
                 segment.points.append(point)
-                print(point.longitude)
                 break
-            i += 1
-
-    line = LineString([(0,0), (18.98, 0)])
-    point = Point(0,0)
-    point2 = Point(18.98, 0)
-    print(point.distance(point2))
-    print(Conversions.get_geodesic_length(line))
 
 
     # ocean_segments = [LineString(Conversions.cartesian_list_to_gcs(segment.line_string.coords))
