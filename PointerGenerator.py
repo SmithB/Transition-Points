@@ -62,7 +62,7 @@ def segmentation(rgt_mask, land_mask, rgt):  # Uses modified land Mask
 
 def merge_touching_segments(segments):
     """
-    Merges ocean line segments that should be connected but were split incorrectly by shapely
+    Merges line segments that should be connected but were split incorrectly by shapely
     :param segments: list of Segments
     :return: cleaned list of Segments
     """
@@ -141,24 +141,8 @@ def remove_segments_under_thresh(segments):
         if segment.length >= MIN_TRANSITION_DIST:
             clean_segments.append(segment)
         elif clean_segments:
-            print('attempt')
-            # print(clean_segments[-1])
-            # print(segment.length)
-            # print(clean_segments[-1].length)
-            # print('len: ', len(clean_segments[-1].line_string.coords.xy[0]))
-            # line = shapely.snap(clean_segments[-1].line_string, segment.line_string, 0.25)
-            # print('len: ', len(line.coords.xy[0]))
-            # print(type(line))
-            # print('valid: ', shapely.is_valid(line))
-            # # new_segment = combine_segments(clean_segments[-1], segment, clean_segments[-1].state)
-            # # print(new_segment.length)
-            # length = clean_segments[-1].length + segment.length
-            # new_segment = Segment(line, clean_segments[-1].state, length)
-
             coords = list(clean_segments[-1].line_string.coords)
-            print(coords)
             coords.extend(list(segment.line_string.coords))
-            print(coords)
             line = LineString(coords)
             length = clean_segments[-1].length + segment.length
 
@@ -187,32 +171,6 @@ def modify_overlaps(segments):  # This might have to be called after remove_insi
     print('todo')
 
 
-def combine_segments(segment1: Segment, segment2: Segment, state: State):
-    """
-    Merges two given segments with specified state
-    :param segment1: Segment object
-    :param segment2: Segment object
-    :param state: Specified State
-    :return: merge segment
-    """
-    multi_line = [segment1.line_string, segment2.line_string]
-
-    buffered_segments = [segment1.line_string, segment2.line_string]
-    merged = shapely.unary_union(buffered_segments)
-
-    new_segment = None
-    if isinstance(merged, LineString):
-        new_length = segment1.length + segment2.length
-        new_segment = Segment(merged, state, new_length)
-    elif isinstance(merged, MultiLineString):
-        print('Multi')
-    else:
-        print('Merging issue')
-        print(type(merged))
-
-    return new_segment
-
-
 def generate_ideal_points(segments):
     for segment in segments:
         x = segment.line_string.coords[-1][0]
@@ -235,3 +193,28 @@ def assign_points(rgt, points_dict, segments):
                 segment.points.append(point)
                 break
     return segments
+
+
+def merge_rgt_ocean(segments):
+    segments_clean = [segments[0]]
+
+    for i in range(len(segments)):
+        if segments[i].state == State.OCEAN:
+            segments[i].state = State.RGT
+
+    for i in range(1, len(segments)):
+        if segments_clean[-1].state == State.RGT:
+            if segments[i].state == State.RGT:
+                print("here")
+                coords = list(segments_clean[-1].line_string.coords)
+                coords.extend(segments[i].line_string.coords)
+                new_length = segments_clean[-1].length + segments[i].length
+                new_segment = Segment(LineString(coords), State.RGT, new_length)
+                segments_clean.pop()
+                segments_clean.append(new_segment)
+            else:
+                segments_clean.append(segments[i])
+        else:
+            segments_clean.append(segments[i])
+
+    return segments_clean
