@@ -7,6 +7,7 @@ import shapely
 import PointerGenerator as Pg
 from Segment import Segment, State
 import CsvHandler as Ch
+import algo
 
 
 # TODO find out where this code should go in main
@@ -37,34 +38,31 @@ def test_rgt_and_mask_intersection():
     segments_clean = Pg.remove_insignificant_segments(segments_clean)
     segments_clean = Pg.sort_segments_by_coordinates(segments_clean, Conversions.gcs_to_cartesian(0.021, -18.04))
     segments = Pg.remove_segments_under_thresh(segments_clean)
+    segments = Pg.merge_rgt_ocean(segments)
+
+    for segment in segments:
+        print(segment.state)
 
     # Leave as Segment objects when doing actually, needs length stuff
-    mask_segments = [LineString(Conversions.cartesian_list_to_gcs(segment.line_string.coords))
-                     for segment in segments if segment.state == State.RGT]
-
-    land_segments = [LineString(Conversions.cartesian_list_to_gcs(segment.line_string.coords))
-                     for segment in segments if segment.state == State.VEGETATION]
-
-    ocean_segments = [LineString(Conversions.cartesian_list_to_gcs(segment.line_string.coords))
-                      for segment in segments if segment.state == State.OCEAN]
-
-    # Multi Line String
-    if len(mask_segments) != 0:
-        print("MASK: ")
-        KmlTester.create_file_multiline(MultiLineString(mask_segments))
-    if len(land_segments) != 0:
-        print("LAND: ")
-        KmlTester.create_file_multiline(MultiLineString(land_segments))
-    if len(ocean_segments) != 0:
-        print("OCEAN: ")
-        KmlTester.create_file_multiline(MultiLineString(ocean_segments))
-
-
-    print("new")
-    for segment in segments_clean:
-        print(f'{segment.state}: {segment.length}')
-    print(len(segments_clean))
-    Pg.generate_ideal_points(segments_clean)
+    # mask_segments = [LineString(Conversions.cartesian_list_to_gcs(segment.line_string.coords))
+    #                  for segment in segments if segment.state == State.RGT]
+    #
+    # land_segments = [LineString(Conversions.cartesian_list_to_gcs(segment.line_string.coords))
+    #                  for segment in segments if segment.state == State.VEGETATION]
+    #
+    # ocean_segments = [LineString(Conversions.cartesian_list_to_gcs(segment.line_string.coords))
+    #                   for segment in segments if segment.state == State.OCEAN]
+    #
+    # # Multi Line String
+    # if len(mask_segments) != 0:
+    #     print("MASK: ")
+    #     KmlTester.create_file_multiline(MultiLineString(mask_segments))
+    # if len(land_segments) != 0:
+    #     print("LAND: ")
+    #     KmlTester.create_file_multiline(MultiLineString(land_segments))
+    # if len(ocean_segments) != 0:
+    #     print("OCEAN: ")
+    #     KmlTester.create_file_multiline(MultiLineString(ocean_segments))
 
     points_dict = {}
     for i in range(1, 1388):
@@ -72,13 +70,20 @@ def test_rgt_and_mask_intersection():
 
     points_dict = Ch.read_csv('/Users/pvelmuru/PycharmProjects/Transistion Points/RGT_transition_locations_V2.0 1.csv',
                               points_dict)
-    Pg.assign_points(17, points_dict, segments_clean)
+    Pg.assign_points(17, points_dict, segments)
 
+    # TODO ensure coordinates are of right units
+    # must happen soon
+    for i in range(len(segments)):
+        print(i)
+        print(segments[i].points)
 
-    # ocean_segments = [LineString(Conversions.cartesian_list_to_gcs(segment.line_string.coords))
-    #                   for segment in segments_clean if segment.state == State.OCEAN]
-    # print("OCEAN CLEAN: ")
-    # KmlTester.create_file_multiline(MultiLineString(ocean_segments))
+    segments = algo.validate_points(segments)
+    for segment in segments:
+        if len(segment.points) != 0:
+            # print(segment.points[0].longitude, segment.points[0].latitude)
+            print(Conversions.cartesian_to_gcs(segment.points[0].latitude, segment.points[0].longitude))
+
 
 
 test_rgt_and_mask_intersection()
