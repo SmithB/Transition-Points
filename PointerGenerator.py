@@ -60,7 +60,6 @@ def segmentation(rgt_mask, land_mask, rgt):  # Uses modified land Mask
     return segments
 
 
-# TODO look into implementing for all segments -- might not be necessary
 def merge_touching_segments(segments):
     """
     Merges ocean line segments that should be connected but were split incorrectly by shapely
@@ -71,17 +70,23 @@ def merge_touching_segments(segments):
     land_segments = [segment for segment in segments if segment.state == State.VEGETATION]
     ocean_segments = [segment for segment in segments if segment.state == State.OCEAN]
 
-    i = 0
-    while i < len(ocean_segments) - 1:
-        ocean_segment1 = ocean_segments[i].line_string
-        ocean_segment2 = ocean_segments[i + 1].line_string
-        if ocean_segment1.touches(ocean_segment2):
-            merge_coords = list(ocean_segment1.coords)[:-1] + list(ocean_segment2.coords)
-            new_length = ocean_segments[i].length + ocean_segments[i+1].length
-            new_segment = Segment(LineString(merge_coords), State.OCEAN, new_length)
-            ocean_segments[i] = new_segment
-            ocean_segments.pop(i + 1)
-        i += 1
+    def merge(segments):
+        i = 0
+        while i < len(segments) - 1:
+            segment1 = segments[i].line_string
+            segment2 = segments[i + 1].line_string
+            if segment1.touches(segment2):
+                merge_coords = list(segment1.coords)[:-1] + list(segment2.coords)
+                new_length = segments[i].length + segments[i+1].length
+                new_segment = Segment(LineString(merge_coords), State.OCEAN, new_length)
+                segments[i] = new_segment
+                segments.pop(i + 1)
+            i += 1
+        return segments
+
+    mask_segments = merge(mask_segments)
+    land_segments = merge(land_segments)
+    ocean_segments = merge(ocean_segments)
     return mask_segments + land_segments + ocean_segments
 
 
@@ -131,9 +136,35 @@ def remove_segments_under_thresh(segments):
     """
     clean_segments = []
 
+    # TODO handle case where the first segment is less than MIN_transition_dist
     for segment in segments:
         if segment.length >= MIN_TRANSITION_DIST:
             clean_segments.append(segment)
+        elif clean_segments:
+            print('attempt')
+            # print(clean_segments[-1])
+            # print(segment.length)
+            # print(clean_segments[-1].length)
+            # print('len: ', len(clean_segments[-1].line_string.coords.xy[0]))
+            # line = shapely.snap(clean_segments[-1].line_string, segment.line_string, 0.25)
+            # print('len: ', len(line.coords.xy[0]))
+            # print(type(line))
+            # print('valid: ', shapely.is_valid(line))
+            # # new_segment = combine_segments(clean_segments[-1], segment, clean_segments[-1].state)
+            # # print(new_segment.length)
+            # length = clean_segments[-1].length + segment.length
+            # new_segment = Segment(line, clean_segments[-1].state, length)
+
+            coords = list(clean_segments[-1].line_string.coords)
+            print(coords)
+            coords.extend(list(segment.line_string.coords))
+            print(coords)
+            line = LineString(coords)
+            length = clean_segments[-1].length + segment.length
+
+            new_segment = Segment(line, clean_segments[-1].state, length)
+            clean_segments.pop()
+            clean_segments.append(new_segment)
 
     return clean_segments
 
@@ -164,9 +195,21 @@ def combine_segments(segment1: Segment, segment2: Segment, state: State):
     :param state: Specified State
     :return: merge segment
     """
-    new_line = shapely.line_merge(segment1.line_string, segment2.line_string)
-    new_length = segment1.length + segment2.length
-    new_segment = Segment(new_line, state, new_length)
+    multi_line = [segment1.line_string, segment2.line_string]
+
+    buffered_segments = [segment1.line_string, segment2.line_string]
+    merged = shapely.unary_union(buffered_segments)
+
+    new_segment = None
+    if isinstance(merged, LineString):
+        new_length = segment1.length + segment2.length
+        new_segment = Segment(merged, state, new_length)
+    elif isinstance(merged, MultiLineString):
+        print('Multi')
+    else:
+        print('Merging issue')
+        print(type(merged))
+
     return new_segment
 
 

@@ -35,8 +35,8 @@ def test_rgt_and_mask_intersection():
 
     segments_clean = Pg.merge_touching_segments(segments)
     segments_clean = Pg.remove_insignificant_segments(segments_clean)
-    segments_clean = Pg.remove_segments_under_thresh(segments_clean)
-    segments = Pg.sort_segments_by_coordinates(segments_clean, Conversions.gcs_to_cartesian(0.021, -18.04))
+    segments_clean = Pg.sort_segments_by_coordinates(segments_clean, Conversions.gcs_to_cartesian(0.021, -18.04))
+    segments = Pg.remove_segments_under_thresh(segments_clean)
 
     # Leave as Segment objects when doing actually, needs length stuff
     mask_segments = [LineString(Conversions.cartesian_list_to_gcs(segment.line_string.coords))
