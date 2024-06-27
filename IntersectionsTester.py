@@ -12,8 +12,8 @@ import algo
 
 # TODO find out where this code should go in main
 def test_rgt_and_mask_intersection():
-    # orbit_gcs = Kr.get_coordinates_from_kml('/Users/pvelmuru/Desktop/IS2_RGT_0001_cycle12_23-Jun-2021.kml')
-    orbit_gcs = Kr.get_coordinates_from_kml('/Users/pvelmuru/Downloads/IS2_RGTs_cycle12_date_time/IS2_RGT_0017_cycle12_24-Jun-2021.kml')
+    rgt = 13  # Do not forget the sort -- will sort backwards otherwise
+    orbit_gcs = Kr.get_coordinates_from_kml('/Users/pvelmuru/Downloads/IS2_RGTs_cycle12_date_time/IS2_RGT_0013_cycle12_24-Jun-2021.kml')
     orbit_cart = Conversions.gcs_list_to_cartesian(orbit_gcs)
     orbit_line = LineString(orbit_cart)
 
@@ -36,7 +36,8 @@ def test_rgt_and_mask_intersection():
 
     segments_clean = Pg.merge_touching_segments(segments)
     segments_clean = Pg.remove_insignificant_segments(segments_clean)
-    segments_clean = Pg.sort_segments_by_coordinates(segments_clean, Conversions.gcs_to_cartesian(0.021, -18.04))
+    # segments_clean = Pg.sort_segments_by_coordinates(segments_clean, Conversions.gcs_to_cartesian(0.021, -18.04))
+    segments_clean = Pg.sort_segments_by_coordinates(segments_clean, Conversions.gcs_to_cartesian(0.0608882644439, 76.4319713082))
     segments = Pg.remove_segments_under_thresh(segments_clean)
     segments = Pg.merge_rgt_ocean(segments)
 
@@ -70,7 +71,9 @@ def test_rgt_and_mask_intersection():
 
     points_dict = Ch.read_csv('/Users/pvelmuru/PycharmProjects/Transistion Points/RGT_transition_locations_V2.0 1.csv',
                               points_dict)
-    Pg.assign_points(17, points_dict, segments)
+    for point in points_dict[rgt]:
+        print('point: ', point.longitude, point.latitude)
+    Pg.assign_points(rgt, points_dict, segments)
 
     # TODO ensure coordinates are of right units
     # must happen soon

@@ -3,6 +3,7 @@ import Conversions
 import Intersections
 from shapely import LineString, MultiLineString, Point
 import shapely
+import Point as Pt
 
 
 MIN_TRANSITION_DIST = 550  # Kilometers
@@ -137,8 +138,9 @@ def remove_segments_under_thresh(segments):
     clean_segments = []
 
     # TODO handle case where the first segment is less than MIN_transition_dist
+    index = 0
     for segment in segments:
-        if segment.length >= MIN_TRANSITION_DIST:
+        if segment.length >= MIN_TRANSITION_DIST or index == 0:
             clean_segments.append(segment)
         elif clean_segments:
             coords = list(clean_segments[-1].line_string.coords)
@@ -149,6 +151,7 @@ def remove_segments_under_thresh(segments):
             new_segment = Segment(line, clean_segments[-1].state, length)
             clean_segments.pop()
             clean_segments.append(new_segment)
+        index += 1
 
     return clean_segments
 
@@ -187,10 +190,12 @@ def assign_points(rgt, points_dict, segments):
     :return: list of Segment objects with transition points assigned to them
     """
     for point in points_dict[rgt]:
-        temp_point = Point(Conversions.gcs_to_cartesian(point.latitude, point.longitude))
+        cart_coords = Conversions.gcs_to_cartesian(point.latitude, point.longitude)
+        temp_point = Point(cart_coords)
+        modified_point = Pt.Point(point.rgt, point.state, cart_coords[1], cart_coords[0])
         for segment in segments:
             if shapely.dwithin(temp_point, segment.line_string, 10000):  # 10000 is roughly 10 km
-                segment.points.append(point)
+                segment.points.append(modified_point)
                 break
     return segments
 

@@ -1,5 +1,7 @@
 from shapely import Point
 import Point as Pt
+from Point import TypePoint
+from Segment import State
 
 
 TOLERANCE = 100000 # roughly 100 km
@@ -19,6 +21,7 @@ def validate_points(segments):
                     print('Warning') # donates it TP hoping that the next segment has two points
                     segments[i - 1].points = segments[i].points[:]
                     segments[i - 1] = push_up(segments[i - 1])
+                    print(segments[i-1].points[0].latitude,segments[i-1].points[0].longitude)
                     segments[i].points.pop()
                 else:
                     segments[i] = push_up(segments[i])
@@ -26,7 +29,11 @@ def validate_points(segments):
             if i > 0:
                 if len(segments[i - 1].points) == 0:
                     segments[i - 1].points.append(segments[i].points[0])
-                    segments[i].points.popleft()
+                    segments[i - 1] = push_up(segments[i - 1])
+                    segments[i].points.pop(0)
+                    segments[i] = push_up(segments[i])
+                else:
+                    print("idk, check the next seg????")
         elif num_points == 3:
             segments[i].points = [segments[i].points[-1]]
             segments[i] = push_up(segments[i])
@@ -47,8 +54,12 @@ def push_up(segment):
     if point.distance(segment_endpoint) > TOLERANCE:
         new_x = list(segment_endpoint.coords)[0][0]
         new_y = list(segment_endpoint.coords)[0][1]
-        print('x', new_x)
-        print('y', new_y)
-        segment.points[-1] = Pt.Point(segment.points[-1].rgt, segment.points[-1].state, new_x, new_y)
+        new_state = None
+        if segment.points[-1].state == State.RGT:
+            new_state = TypePoint.VEGETATION
+        else:
+            new_state = TypePoint.RGT
+
+        segment.points[-1] = Pt.Point(segment.points[-1].rgt, new_state, new_x, new_y)
 
     return segment
