@@ -12,8 +12,9 @@ import algo
 
 # TODO find out where this code should go in main
 def test_rgt_and_mask_intersection():
-    rgt = 13  # Do not forget the sort -- will sort backwards otherwise
-    orbit_gcs = Kr.get_coordinates_from_kml('/Users/pvelmuru/Downloads/IS2_RGTs_cycle12_date_time/IS2_RGT_0013_cycle12_24-Jun-2021.kml')
+    rgt = 678  # Do not forget the sort -- will sort backwards otherwise
+    current_state = State.RGT
+    orbit_gcs = Kr.get_coordinates_from_kml('/Users/pvelmuru/Downloads/IS2_RGTs_cycle12_date_time/IS2_RGT_0678_cycle12_07-Aug-2021.kml')
     orbit_cart = Conversions.gcs_list_to_cartesian(orbit_gcs)
     orbit_line = LineString(orbit_cart)
 
@@ -21,7 +22,8 @@ def test_rgt_and_mask_intersection():
     mask_polygons_cart = [Polygon(Conversions.gcs_list_to_cartesian(coords)) for coords in mask_gcs_coords]
     mask_multipolygon = shapely.make_valid(MultiPolygon(mask_polygons_cart))
 
-    land_gcs_coords = Kr.parse_mask('/Users/pvelmuru/PycharmProjects/Transistion Points/assets/land_mask.kml')
+    # land_gcs_coords = Kr.parse_mask('/Users/pvelmuru/PycharmProjects/Transistion Points/assets/land_mask.kml')
+    land_gcs_coords = Kr.parse_mask('/Users/pvelmuru/Desktop/accurate_land_mask/accurate_land_mask.kml')
     land_polygon_cart = [Polygon(Conversions.gcs_list_to_cartesian(coordinates)) for coordinates in land_gcs_coords]
     land_multipolygon = shapely.make_valid(MultiPolygon(land_polygon_cart))
 
@@ -30,14 +32,16 @@ def test_rgt_and_mask_intersection():
     new_land_cart = [Polygon(Conversions.gcs_list_to_cartesian(polygon.exterior.coords))
                      for polygon in new_land_multipolygon.geoms]
     new_land_final_multi = shapely.make_valid(MultiPolygon(new_land_cart))
-    new_land_final_multi = shapely.make_valid(new_land_final_multi)
+    # new_land_final_multi = shapely.make_valid(new_land_final_multi)
 
     segments = Pg.segmentation(mask_multipolygon, new_land_final_multi, orbit_line)
 
     segments_clean = Pg.merge_touching_segments(segments)
     segments_clean = Pg.remove_insignificant_segments(segments_clean)
     # segments_clean = Pg.sort_segments_by_coordinates(segments_clean, Conversions.gcs_to_cartesian(0.021, -18.04))
-    segments_clean = Pg.sort_segments_by_coordinates(segments_clean, Conversions.gcs_to_cartesian(0.0608882644439, 76.4319713082))
+    segments_clean = Pg.sort_segments_by_coordinates(segments_clean, Conversions.gcs_to_cartesian(0.0478959247557, -150.413277323))
+    # segments_clean = Pg.sort_segments_by_coordinates(segments_clean,
+    #                                                 Conversions.gcs_to_cartesian(-0.080721, 52.829))
     segments = Pg.remove_segments_under_thresh(segments_clean)
     segments = Pg.merge_rgt_ocean(segments)
 
@@ -82,10 +86,19 @@ def test_rgt_and_mask_intersection():
         print(segments[i].points)
 
     segments = algo.validate_points(segments)
+
+    points_dict[rgt] = []
+    # for segment in segments:
+    #     for point in segment.points:
+    #         points_dict[rgt].append(point)
+    #         print(point.latitude, point.longitude)
+    i = 0
     for segment in segments:
         if len(segment.points) != 0:
             # print(segment.points[0].longitude, segment.points[0].latitude)
+            print(i)
             print(Conversions.cartesian_to_gcs(segment.points[0].latitude, segment.points[0].longitude))
+            i += 1
 
 
 

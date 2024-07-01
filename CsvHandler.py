@@ -1,4 +1,6 @@
 import csv
+
+import Conversions
 from Point import Point, TypePoint
 
 
@@ -39,4 +41,5 @@ def write_csv(filename, points_dict):
         writer.writerow(['rgt', 'trans_type', 'lat', 'lon'])
         for rgt in points_dict:
             for point in points_dict[rgt]:
-                writer.writerow([point.rgt, point.state.value, point.latitude, point.longitude])
+                gcs_coords = Conversions.cartesian_to_gcs(point.latitude, point.longitude)
+                writer.writerow([point.rgt, point.state.value, gcs_coords[1], gcs_coords[0]])

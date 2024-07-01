@@ -132,6 +132,7 @@ def sort_segments_by_coordinates(segments, starting_coordinate):
 def remove_segments_under_thresh(segments):
     """
     Removes line segments that are under the minimum distance threshold
+    Segments must be sorted before use
     :param segments: list of Segments
     :return: clean list of Segments
     """
@@ -139,8 +140,9 @@ def remove_segments_under_thresh(segments):
 
     # TODO handle case where the first segment is less than MIN_transition_dist
     index = 0
+    last_seg_index = len(segments) - 1
     for segment in segments:
-        if segment.length >= MIN_TRANSITION_DIST or index == 0:
+        if segment.length >= MIN_TRANSITION_DIST or index == 0 or index == last_seg_index:
             clean_segments.append(segment)
         elif clean_segments:
             coords = list(clean_segments[-1].line_string.coords)
