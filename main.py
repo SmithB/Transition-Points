@@ -89,11 +89,13 @@ def main():
                 points_dict[rgt].append(segment.points[0])
 
         # test code
-        # if rgt == 17:
-        #     # print(f'start: {start_latitude}   {start_longitude}')
-        #     # test(segments)
-        #     print(points_dict[rgt])
-        #     return
+        if rgt == 802:
+            # print(f'start: {start_latitude}   {start_longitude}')
+            # test(segments)
+            print('why')
+            for point in points_dict[802]:
+                print(Conversions.cartesian_to_gcs(point.latitude, point.longitude))
+            return
 
         # for segment in segments:
         #     if len(segment.points) != 0:

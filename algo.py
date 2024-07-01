@@ -15,7 +15,8 @@ TOLERANCE = 10 # roughly .0100 km
 
 def validate_points(segments):
     print('segments: ', len(segments))
-    for i in range(len(segments)):
+    i = 0
+    while i < len(segments):
         print('i: ', i)
         num_points = len(segments[i].points)
         if i == len(segments) - 1:
@@ -25,7 +26,7 @@ def validate_points(segments):
                 if len(segments[i - 1].points) == 0:
                     if len(segments[i].points) > 0:
                         segments[i - 1].points.append(segments[i].points[0])
-                        segments[i].points.pop(0)
+                        segments[i].points.pop()
                         segments[i - 1] = push_up(segments[i - 1])
             break
 
@@ -52,7 +53,7 @@ def validate_points(segments):
                     segments[i].points.pop()
                     segments[i] = push_up(segments[i])
 
-                elif i < len(segments) - 1 and len(segments[i + 1].points) == 0: # -2 because this prevents the second to last to append a point to the last segment
+                elif i < len(segments) - 1: # -2 because this prevents the second to last to append a point to the last segment
                     if i < len(segments) - 2:
                         segments[i + 1].points.append(segments[i].points[1])
                     segments[i].points.pop()
@@ -66,17 +67,39 @@ def validate_points(segments):
                     segments[i] = push_up(segments[i])
         elif num_points == 3:
             print(3)
-            segments[i].points = [segments[i].points[-1]]
+            if i > 0:
+                if len(segments[i - 1].points) == 0:
+                    segments[i - 1].points.append(segments[i].points[0])
+                    segments[i - 1] = push_up(segments[i - 1])
+                    segments[i].points.pop(0)
+                    continue
+
+            segments[i].points = [segments[i].points[-1]] # Essentially removes the first two points
             segments[i] = push_up(segments[i])
         elif num_points == 4:
             print(4)
             # 4+ should not be happening with an upgraded map
             # might have to account for pushing back 1 and then deleting two in the middle
-            print('FOUR!')
+
+            if i > 0:
+                if len(segments[i - 1].points) == 0:
+                    segments[i - 1].points.append(segments[i].points[0])
+                    segments[i - 1] = push_up(segments[i - 1])
+                    segments[i].points = [segments[i].points[-1]]  # removes first two points
+                    segments[i] = push_up(segments[i])
+                elif i < len(segments) - 1:
+                    if len(segments[i + 1].points) == 0:
+                        segments[i + 1].points.append(segments[i].points[-1])
+                        segments[i].points = [segments[i].points[-1]]  # removes first two points
+                        segments[i] = push_up(segments[i])
+            else:
+                print('Big issue')
         else:
             # 4+ should not be happening with an upgraded map
             print(num_points)
             print('figure out later')
+
+        i += 1
 
     return segments
 

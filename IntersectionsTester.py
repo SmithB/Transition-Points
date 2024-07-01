@@ -12,9 +12,9 @@ import algo
 
 # TODO find out where this code should go in main
 def test_rgt_and_mask_intersection():
-    rgt = 678  # Do not forget the sort -- will sort backwards otherwise
+    rgt = 802  # Do not forget the sort -- will sort backwards otherwise
     current_state = State.RGT
-    orbit_gcs = Kr.get_coordinates_from_kml('/Users/pvelmuru/Downloads/IS2_RGTs_cycle12_date_time/IS2_RGT_0678_cycle12_07-Aug-2021.kml')
+    orbit_gcs = Kr.get_coordinates_from_kml('/Users/pvelmuru/Downloads/IS2_RGTs_cycle12_date_time/IS2_RGT_0802_cycle12_15-Aug-2021.kml')
     orbit_cart = Conversions.gcs_list_to_cartesian(orbit_gcs)
     orbit_line = LineString(orbit_cart)
 
@@ -39,7 +39,7 @@ def test_rgt_and_mask_intersection():
     segments_clean = Pg.merge_touching_segments(segments)
     segments_clean = Pg.remove_insignificant_segments(segments_clean)
     # segments_clean = Pg.sort_segments_by_coordinates(segments_clean, Conversions.gcs_to_cartesian(0.021, -18.04))
-    segments_clean = Pg.sort_segments_by_coordinates(segments_clean, Conversions.gcs_to_cartesian(0.0478959247557, -150.413277323))
+    segments_clean = Pg.sort_segments_by_coordinates(segments_clean, Conversions.gcs_to_cartesian(0.0340257118173,  160.791155934))
     # segments_clean = Pg.sort_segments_by_coordinates(segments_clean,
     #                                                 Conversions.gcs_to_cartesian(-0.080721, 52.829))
     segments = Pg.remove_segments_under_thresh(segments_clean)
@@ -97,6 +97,7 @@ def test_rgt_and_mask_intersection():
         if len(segment.points) != 0:
             # print(segment.points[0].longitude, segment.points[0].latitude)
             print(i)
+            print('len: ', len(segment.points))
             print(Conversions.cartesian_to_gcs(segment.points[0].latitude, segment.points[0].longitude))
             i += 1
 
