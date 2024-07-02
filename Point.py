@@ -7,8 +7,9 @@ class TypePoint(Enum):
 
 
 class Point:
-    def __init__(self, rgt: int, state: TypePoint, latitude: float, longitude: float):
+    def __init__(self, rgt: int, state: TypePoint, latitude: float, longitude: float, asc_req: int = -1):
         self.rgt = rgt
         self.state = state
         self.latitude = latitude
         self.longitude = longitude
+        self.asc_req = asc_req

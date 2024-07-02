@@ -12,7 +12,7 @@ import os
 
 
 def main():
-
+    curr_state = State.RGT
     mask_gcs_coords = Kr.parse_mask('/Users/pvelmuru/Desktop/snow_depth_mask.kml')
     mask_polygons_cart = [Polygon(Conversions.gcs_list_to_cartesian(coords)) for coords in mask_gcs_coords]
     mask_multipolygon = shapely.make_valid(MultiPolygon(mask_polygons_cart))
@@ -53,7 +53,6 @@ def main():
         orbit_cart = Conversions.gcs_list_to_cartesian(orbit_gcs)
         orbit_line = LineString(orbit_cart)
 
-
         segments = Pg.segmentation(mask_multipolygon, new_land_final_multi, orbit_line)
 
         segments_clean = Pg.merge_touching_segments(segments)
@@ -73,9 +72,12 @@ def main():
 
         # TODO ensure coordinates are of right units
         # must happen soon
-        # for i in range(len(segments)):
-        #     print(i)
-        #     print(segments[i].points)
+        for i in range(len(segments)):
+            print(i)
+            point_list = []
+            for point in segments[i].points:
+                point_list.append(point.state)
+            print(point_list)
 
         segments = algo.validate_points(segments)
 
@@ -86,19 +88,21 @@ def main():
         for segment in segments:
             if len(segment.points) != 0:
                 points_dict[rgt].append(segment.points[0])
-                if rgt == 802:
-                    print(len(segment.points))
-                    print(Conversions.cartesian_to_gcs(segment.points[0].latitude, segment.points[0].longitude))
+                # if rgt == 432:
+                #     return
+                    # print(len(segment.points))
+                    # print(Conversions.cartesian_to_gcs(segment.points[0].latitude, segment.points[0].longitude))
+        curr_state = points_dict[rgt][-1].state
 
         # test code
         print(f'rgt {rgt}: {start_latitude}   {start_longitude}')
-        if rgt == 237:
-            print(f'start: {start_latitude}   {start_longitude}')
-            # test(segments)
-            print('why')
-            for point in points_dict[802]:
-                print(Conversions.cartesian_to_gcs(point.latitude, point.longitude))
-            return
+        # if rgt == 237:
+        #     print(f'start: {start_latitude}   {start_longitude}')
+        #     # test(segments)
+        #     print('why')
+        #     for point in points_dict[802]:
+        #         print(Conversions.cartesian_to_gcs(point.latitude, point.longitude))
+        #     return
 
         # for segment in segments:
         #     if len(segment.points) != 0:

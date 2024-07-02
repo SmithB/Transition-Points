@@ -17,11 +17,12 @@ def read_csv(filename, points_dict):
         try:
             for row in reader:
                 rgt, type_point, latitude, longitude = int(row[0]), int(row[2]), float(row[3]), float(row[4])
+                asc_req = int(row[5])
                 # print(f'rgt:{rgt} point: {type_point} lat: {latitude} long: {longitude}')
 
                 state = TypePoint.RGT if type_point == 0 else TypePoint.VEGETATION
 
-                point = Point(rgt, state, latitude, longitude)
+                point = Point(rgt, state, latitude, longitude, asc_req)
                 points_dict[rgt].append(point)
             return points_dict
         except Exception as e:
@@ -38,8 +39,8 @@ def write_csv(filename, points_dict):
     """
     with open(filename, 'w', newline='') as csvfile:
         writer = csv.writer(csvfile, delimiter=',')
-        writer.writerow(['rgt', 'trans_type', 'lat', 'lon'])
+        writer.writerow(['rgt', 'trans_type', 'lat', 'lon', 'asc_req'])
         for rgt in points_dict:
             for point in points_dict[rgt]:
                 gcs_coords = Conversions.cartesian_to_gcs(point.latitude, point.longitude)
-                writer.writerow([point.rgt, point.state.value, gcs_coords[1], gcs_coords[0]])
+                writer.writerow([point.rgt, point.state.value, gcs_coords[1], gcs_coords[0], point.asc_req])
