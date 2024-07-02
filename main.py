@@ -53,7 +53,6 @@ def main():
         orbit_cart = Conversions.gcs_list_to_cartesian(orbit_gcs)
         orbit_line = LineString(orbit_cart)
 
-        # print(list(orbit_line.coords))
 
         segments = Pg.segmentation(mask_multipolygon, new_land_final_multi, orbit_line)
 
@@ -87,10 +86,14 @@ def main():
         for segment in segments:
             if len(segment.points) != 0:
                 points_dict[rgt].append(segment.points[0])
+                if rgt == 802:
+                    print(len(segment.points))
+                    print(Conversions.cartesian_to_gcs(segment.points[0].latitude, segment.points[0].longitude))
 
         # test code
-        if rgt == 802:
-            # print(f'start: {start_latitude}   {start_longitude}')
+        print(f'rgt {rgt}: {start_latitude}   {start_longitude}')
+        if rgt == 237:
+            print(f'start: {start_latitude}   {start_longitude}')
             # test(segments)
             print('why')
             for point in points_dict[802]:
@@ -104,9 +107,11 @@ def main():
 
         rgt += 1
         cart_coords = list(orbit_line.coords)[-1]
-        gcs_coords = Conversions.cartesian_to_gcs(cart_coords[1], cart_coords[0])
-        start_latitude = gcs_coords[0]
-        start_longitude = gcs_coords[1]
+        print(cart_coords)
+        gcs_coords = Conversions.cartesian_to_gcs(cart_coords[0], cart_coords[1])
+        start_latitude = gcs_coords[1]
+        start_longitude = gcs_coords[0]
+        print(f'rgt {rgt}: last coords: {start_latitude} {start_longitude}')
 
     Ch.write_csv('/Users/pvelmuru/Desktop/testwrite.csv', points_dict)
 

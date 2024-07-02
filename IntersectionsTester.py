@@ -12,9 +12,9 @@ import algo
 
 # TODO find out where this code should go in main
 def test_rgt_and_mask_intersection():
-    rgt = 802  # Do not forget the sort -- will sort backwards otherwise
+    rgt = 334  # Do not forget the sort -- will sort backwards otherwise
     current_state = State.RGT
-    orbit_gcs = Kr.get_coordinates_from_kml('/Users/pvelmuru/Downloads/IS2_RGTs_cycle12_date_time/IS2_RGT_0802_cycle12_15-Aug-2021.kml')
+    orbit_gcs = Kr.get_coordinates_from_kml('/Users/pvelmuru/Downloads/IS2_RGTs_cycle12_date_time/IS2_RGT_0334_cycle12_15-Jul-2021.kml')
     orbit_cart = Conversions.gcs_list_to_cartesian(orbit_gcs)
     orbit_line = LineString(orbit_cart)
 
@@ -39,7 +39,7 @@ def test_rgt_and_mask_intersection():
     segments_clean = Pg.merge_touching_segments(segments)
     segments_clean = Pg.remove_insignificant_segments(segments_clean)
     # segments_clean = Pg.sort_segments_by_coordinates(segments_clean, Conversions.gcs_to_cartesian(0.021, -18.04))
-    segments_clean = Pg.sort_segments_by_coordinates(segments_clean, Conversions.gcs_to_cartesian(0.0340257118173,  160.791155934))
+    segments_clean = Pg.sort_segments_by_coordinates(segments_clean, Conversions.gcs_to_cartesian(0.0171304834701, 54.6335064))
     # segments_clean = Pg.sort_segments_by_coordinates(segments_clean,
     #                                                 Conversions.gcs_to_cartesian(-0.080721, 52.829))
     segments = Pg.remove_segments_under_thresh(segments_clean)
@@ -49,25 +49,25 @@ def test_rgt_and_mask_intersection():
         print(segment.state)
 
     # Leave as Segment objects when doing actually, needs length stuff
-    # mask_segments = [LineString(Conversions.cartesian_list_to_gcs(segment.line_string.coords))
-    #                  for segment in segments if segment.state == State.RGT]
-    #
-    # land_segments = [LineString(Conversions.cartesian_list_to_gcs(segment.line_string.coords))
-    #                  for segment in segments if segment.state == State.VEGETATION]
-    #
-    # ocean_segments = [LineString(Conversions.cartesian_list_to_gcs(segment.line_string.coords))
-    #                   for segment in segments if segment.state == State.OCEAN]
-    #
-    # # Multi Line String
-    # if len(mask_segments) != 0:
-    #     print("MASK: ")
-    #     KmlTester.create_file_multiline(MultiLineString(mask_segments))
-    # if len(land_segments) != 0:
-    #     print("LAND: ")
-    #     KmlTester.create_file_multiline(MultiLineString(land_segments))
-    # if len(ocean_segments) != 0:
-    #     print("OCEAN: ")
-    #     KmlTester.create_file_multiline(MultiLineString(ocean_segments))
+    mask_segments = [LineString(Conversions.cartesian_list_to_gcs(segment.line_string.coords))
+                     for segment in segments if segment.state == State.RGT]
+
+    land_segments = [LineString(Conversions.cartesian_list_to_gcs(segment.line_string.coords))
+                     for segment in segments if segment.state == State.VEGETATION]
+
+    ocean_segments = [LineString(Conversions.cartesian_list_to_gcs(segment.line_string.coords))
+                      for segment in segments if segment.state == State.OCEAN]
+
+    # Multi Line String
+    if len(mask_segments) != 0:
+        print("MASK: ")
+        KmlTester.create_file_multiline(MultiLineString(mask_segments))
+    if len(land_segments) != 0:
+        print("LAND: ")
+        KmlTester.create_file_multiline(MultiLineString(land_segments))
+    if len(ocean_segments) != 0:
+        print("OCEAN: ")
+        KmlTester.create_file_multiline(MultiLineString(ocean_segments))
 
     points_dict = {}
     for i in range(1, 1388):
@@ -92,6 +92,12 @@ def test_rgt_and_mask_intersection():
     #     for point in segment.points:
     #         points_dict[rgt].append(point)
     #         print(point.latitude, point.longitude)
+    for segment in segments:
+        if len(segment.points) != 0:
+            points_dict[rgt].append(segment.points[0])
+            if rgt == 802:
+                print(len(segment.points))
+                print(Conversions.cartesian_to_gcs(segment.points[0].latitude, segment.points[0].longitude))
     i = 0
     for segment in segments:
         if len(segment.points) != 0:

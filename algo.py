@@ -19,6 +19,7 @@ def validate_points(segments):
     while i < len(segments):
         print('i: ', i)
         num_points = len(segments[i].points)
+
         if i == len(segments) - 1:
             # print('needs to be handled differently')
             # # TODO come up with solution
