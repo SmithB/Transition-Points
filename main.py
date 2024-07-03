@@ -8,6 +8,7 @@ import PointerGenerator as Pg
 from Segment import Segment, State
 import CsvHandler as Ch
 import algo
+import newAlgo
 import os
 
 
@@ -79,7 +80,7 @@ def main():
                 point_list.append(point.state)
             print(point_list)
 
-        segments = algo.validate_points(segments)
+        segments = newAlgo.validate_points(segments)
 
         points_dict[rgt] = []
         # for segment in segments:  --- does all points, though ideally there is only one per segment
