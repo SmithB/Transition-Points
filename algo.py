@@ -51,7 +51,7 @@ def validate_points(segments):
                     segments[i] = push_up(segments[i])
             else: # Handles first segment cases
                 if segments[i].state.value == segments[i].points[0].state.value:
-                    print('do nothing, needs to switch state here') # maybe push back if anything
+                    print('do nothing, needs to switch state here')  # maybe push back if anything
                 else:
                     print(segments[i].state, segments[i].points[0].state)
                     segments[i] = push_up(segments[i])
