@@ -77,7 +77,7 @@ def test_rgt_and_mask_intersection():
                               points_dict)
     for point in points_dict[rgt]:
         print('point: ', point.longitude, point.latitude)
-    Pg.assign_points(rgt, points_dict, segments)
+    segments = Pg.assign_points(rgt, points_dict, segments)
 
     # TODO ensure coordinates are of right units
     # must happen soon

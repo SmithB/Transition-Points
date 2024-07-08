@@ -6,7 +6,7 @@ import shapely
 import Point as Pt
 
 
-MIN_TRANSITION_DIST = 550  # Kilometers
+MIN_TRANSITION_DIST = 1100  # Kilometers
 
 
 def segmentation(rgt_mask, land_mask, rgt):  # Uses modified land Mask
@@ -194,11 +194,12 @@ def assign_points(rgt, points_dict, segments):
     for point in points_dict[rgt]:
         cart_coords = Conversions.gcs_to_cartesian(point.latitude, point.longitude)
         temp_point = Point(cart_coords)
-        modified_point = Pt.Point(point.rgt, point.state, cart_coords[1], cart_coords[0])
+        modified_point = Pt.Point(point.rgt, point.state, cart_coords[1], cart_coords[0], point.asc_req)
         for segment in segments:
             if shapely.dwithin(temp_point, segment.line_string, 10000):  # 10000 is roughly 10 km
                 segment.points.append(modified_point)
                 break
+
     return segments
 
 

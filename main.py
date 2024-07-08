@@ -9,6 +9,7 @@ from Segment import Segment, State
 import CsvHandler as Ch
 import algo
 import newAlgo
+import createAlgo
 import os
 
 
@@ -19,7 +20,7 @@ def main():
     mask_multipolygon = shapely.make_valid(MultiPolygon(mask_polygons_cart))
 
     # land_gcs_coords = Kr.parse_mask('/Users/pvelmuru/PycharmProjects/Transistion Points/assets/land_mask.kml')
-    land_gcs_coords = Kr.parse_mask( '/Users/pvelmuru/Desktop/accurate_land_mask/accurate_land_mask.kml')
+    land_gcs_coords = Kr.parse_mask( '/Users/pvelmuru/Desktop/accurate_land_mask/better/accurate_land_mask_better.kml')
     land_polygon_cart = [Polygon(Conversions.gcs_list_to_cartesian(coordinates)) for coordinates in land_gcs_coords]
     land_multipolygon = shapely.make_valid(MultiPolygon(land_polygon_cart))
 
@@ -46,6 +47,10 @@ def main():
     points_dict = Ch.read_csv('/Users/pvelmuru/PycharmProjects/Transistion Points/RGT_transition_locations_V2.0 1.csv',
                               points_dict)
 
+    # for point in points_dict[664]:
+    #     print(point.state)
+    # breakpoint()
+
     rgt = 1  # Do not forget the sort -- will sort backwards otherwise
     start_latitude = 0.0279589282518
     start_longitude = -0.131847178124
@@ -69,7 +74,7 @@ def main():
         # for point in points_dict[rgt]:
         #     print('point: ', point.longitude, point.latitude)
 
-        Pg.assign_points(rgt, points_dict, segments)
+        segments = Pg.assign_points(rgt, points_dict, segments)
 
         # TODO ensure coordinates are of right units
         # must happen soon
@@ -80,7 +85,14 @@ def main():
                 point_list.append(point.state)
             print(point_list)
 
-        segments = newAlgo.validate_points(segments)
+        segments = createAlgo.validate_points(segments, rgt)
+
+        for i in range(len(segments)):
+            print(i)
+            point_list = []
+            for point in segments[i].points:
+                point_list.append(point.state)
+            print(point_list)
 
         points_dict[rgt] = []
         # for segment in segments:  --- does all points, though ideally there is only one per segment
@@ -88,12 +100,12 @@ def main():
         #         points_dict[rgt].append(point)
         for segment in segments:
             if len(segment.points) != 0:
-                points_dict[rgt].append(segment.points[0])
+                for point in segment.points:
+                    points_dict[rgt].append(point)
                 # if rgt == 432:
                 #     return
                     # print(len(segment.points))
                     # print(Conversions.cartesian_to_gcs(segment.points[0].latitude, segment.points[0].longitude))
-        curr_state = points_dict[rgt][-1].state
 
         # test code
         print(f'rgt {rgt}: {start_latitude}   {start_longitude}')

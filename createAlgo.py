@@ -2,12 +2,14 @@ from shapely import Point
 
 import Conversions
 import Point as Pt
+from Segment import State
+from Point import TypePoint
 
 
 TOLERANCE = 10  # roughly .0100 km
 
 
-def validate_points(segments):
+def validate_points(segments, rgt):
     i = 0
     while i < len(segments):
         num_points = len(segments[i].points)
@@ -45,11 +47,10 @@ def validate_points(segments):
 
         if num_points == 1:
             if i > 0:
-                # print(len(segments[i].points))
                 if segments[i].points[0].state.value == segments[i].state.value:
-                    if len(segments[i - 1].points) < 2: # Accounts for cases where the first segment needs two points
+                    if len(segments[i - 1].points) < 2:  # Accounts for cases where the first segment needs two points
                         segments[i - 1].points.append(segments[i].points[0])
-                        segments[i].points.pop()
+                        segments[i].points.pop(0)
                         segments[i - 1] = push_up(segments[i - 1])
                 else:
                     segments[i] = push_up(segments[i])
@@ -63,21 +64,24 @@ def validate_points(segments):
                     if segments[i].points[0].state.value == segments[i].state.value:
                         segments[i - 1].points.append(segments[i].points[0])
                         segments[i].points.pop(0)
-                        segments[i - 1] = push_up(segments[i - 1])
+                        push_up(segments[i - 1])
                         continue
                 if i < len(segments) - 1:
-                    segments[i + 1].points.insert(0, segments[i].points[1])
-                    segments[i].points.pop()
-                    segments[i] = push_up(segments[i])
-            elif i == 0:
-                if segments[i].points[0].state.value == segments[i].state.value:
-                    # This means this points transitions for this segment
-                    segments[i] = push_up(segments[i])
-                else:
-                    if i < len(segments) - 1:
+                    if segments[i].points[1].state.value == segments[i].state.value:
+                        print("pushed forward")
                         segments[i + 1].points.insert(0, segments[i].points[1])
                         segments[i].points.pop()
-                        segments[i] = push_up(segments[i])
+                        continue
+            elif i == 0:
+                if segments[i].points[0].state.value == segments[i].state.value:
+                    # This means this point transitions for this segment
+                    push_up(segments[i])
+                else:
+                    if i < len(segments) - 1:
+                        if segments[i].points[1].state.value == segments[i].state.value:
+                            segments[i + 1].points.insert(0, segments[i].points[1])
+                            segments[i].points.pop()
+                            push_up(segments[i])
                     else:
                         segments[i].points = []  # Deletes two points as it assumes no state change
                         # print('ERROR 2')
@@ -86,7 +90,8 @@ def validate_points(segments):
                     if segments[i].state.value == segments[i].points[0].state.value:
                         segments[i - 1].points.append(segments[i].points[0])
                         segments[i].points.pop(0)
-                        segments[i - 1] = push_up(segments[i - 1])
+                        push_up(segments[i - 1])
+                        continue
                 elif segments[i].state.value != segments[i].points[0].state.value:
                     if i < len(segments) - 1:
                         segments[i + 1].points.insert(0, segments[i].points[1])
@@ -196,6 +201,13 @@ def validate_points(segments):
         else:
             if num_points != 0:
                 print('ERROR 12')
+
+        if len(segments[i - 1].points) == 0:
+            state = TypePoint.VEGETATION
+            if segments[i].state == State.RGT:
+                state = TypePoint.RGT
+            segments[i - 1].points.append(Pt.Point(rgt, state, 1, 1, -1))  # NEED to generate asc_req
+            push_up(segments[i - 1])
         i += 1
 
     return segments
