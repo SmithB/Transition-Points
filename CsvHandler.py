@@ -42,5 +42,5 @@ def write_csv(filename, points_dict):
         writer.writerow(['rgt', 'trans_type', 'lat', 'lon', 'asc_req'])
         for rgt in points_dict:
             for point in points_dict[rgt]:
-                gcs_coords = Conversions.cartesian_to_gcs(point.latitude, point.longitude)
+                gcs_coords = Conversions.cartesian_to_gcs(point.longitude, point.latitude)
                 writer.writerow([point.rgt, point.state.value, gcs_coords[1], gcs_coords[0], point.asc_req])

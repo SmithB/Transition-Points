@@ -138,7 +138,6 @@ def remove_segments_under_thresh(segments):
     """
     clean_segments = []
 
-    # TODO handle case where the first segment is less than MIN_transition_dist
     index = 0
     last_seg_index = len(segments) - 1
     for segment in segments:
