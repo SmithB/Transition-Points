@@ -1,5 +1,7 @@
 from pyproj import Transformer, Geod
 
+from shapely import LineString
+
 # Transformer objects used to convert units
 to_gcs_transform = Transformer.from_crs("EPSG:3857", "EPSG:4326")
 to_cartesian_transform = Transformer.from_crs("EPSG:4326", "EPSG:3857")
@@ -59,3 +61,7 @@ def get_geodesic_length(line_obj):
     """
     geod = Geod(ellps="WGS84")
     return geod.geometry_length(line_obj) / 1000
+
+
+line = LineString(((-176.63,10.54), (-179.63, 12.13)))
+print(get_geodesic_length(line))

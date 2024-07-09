@@ -27,8 +27,13 @@ def segmentation(rgt_mask, land_mask, rgt):  # Uses modified land Mask
         if type(intersections) is LineString:
             print("LINE String occurs")
             length = Conversions.get_geodesic_length(intersections)
-            segment = Segment(intersections, state, length)
-            segments.append(segment)
+            if state is not state.OCEAN:
+                if rgt.overlaps(intersections):
+                    segment = Segment(intersections, state, length)
+                    segments.append(segment)
+            else:
+                segment = Segment(intersections, state, length)
+                segments.append(segment)
         else:
             for intersection in intersections.geoms:
                 if state is not state.OCEAN:
@@ -141,9 +146,13 @@ def remove_segments_under_thresh(segments):
     index = 0
     last_seg_index = len(segments) - 1
     for segment in segments:
-        if segment.length >= MIN_TRANSITION_DIST or index == 0 or index == last_seg_index:
+        gcs_coords = Conversions.cartesian_list_to_gcs(list(segment.line_string.coords))
+        line = LineString(gcs_coords)
+        dist = Conversions.get_geodesic_length(line)
+        if dist >= MIN_TRANSITION_DIST or index == 0 or index == last_seg_index:
             clean_segments.append(segment)
         elif clean_segments:
+            print('Removing Segment')  # Warning
             coords = list(clean_segments[-1].line_string.coords)
             coords.extend(list(segment.line_string.coords))
             line = LineString(coords)
@@ -164,7 +173,19 @@ def remove_insignificant_segments(segments):
     :param segments: list of all Segments
     :return: clean list of Segment objects
     """
-    clean_segments = [segment for segment in segments if segment.length > 100]
+
+    clean_segments = []
+
+    index = 0
+    last_seg_index = len(segments) - 1
+    for segment in segments:
+        gcs_coords = Conversions.cartesian_list_to_gcs(list(segment.line_string.coords))
+        line = LineString(gcs_coords)
+        dist = Conversions.get_geodesic_length(line)
+        if dist >= 100 or index == 0 or index == last_seg_index:
+            clean_segments.append(segment)
+        index += 1
+
     return clean_segments
 
 
@@ -175,11 +196,6 @@ def modify_overlaps(segments):  # This might have to be called after remove_insi
     print('todo')
 
 
-def generate_ideal_points(segments):
-    for segment in segments:
-        x = segment.line_string.coords[-1][0]
-        y = segment.line_string.coords[-1][1]
-        print(f'{Conversions.cartesian_to_gcs(x, y)[0]}, {Conversions.cartesian_to_gcs(x, y)[1]}')
 
 
 def assign_points(rgt, points_dict, segments):

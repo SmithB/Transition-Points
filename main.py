@@ -14,15 +14,34 @@ import os
 
 
 def main():
-    curr_state = State.RGT
     mask_gcs_coords = Kr.parse_mask('/Users/pvelmuru/Desktop/snow_depth_mask.kml')
     mask_polygons_cart = [Polygon(Conversions.gcs_list_to_cartesian(coords)) for coords in mask_gcs_coords]
     mask_multipolygon = shapely.make_valid(MultiPolygon(mask_polygons_cart))
 
     # land_gcs_coords = Kr.parse_mask('/Users/pvelmuru/PycharmProjects/Transistion Points/assets/land_mask.kml')
     land_gcs_coords = Kr.parse_mask( '/Users/pvelmuru/Desktop/accurate_land_mask/better/accurate_land_mask_better.kml')
+    print(land_gcs_coords)
     land_polygon_cart = [Polygon(Conversions.gcs_list_to_cartesian(coordinates)) for coordinates in land_gcs_coords]
+    print(list(land_polygon_cart[0].exterior.coords))
     land_multipolygon = shapely.make_valid(MultiPolygon(land_polygon_cart))
+
+    # bandage_gcs_coords = Kr.parse_mask('/Users/pvelmuru/Desktop/bandage.kml')
+    # print(bandage_gcs_coords)
+    # bandage_polygon = [Polygon(Conversions.gcs_list_to_cartesian(coords)) for coords in bandage_gcs_coords]
+    # print(list(bandage_polygon[0].exterior.coords))
+    # bandage_multipolygon = shapely.make_valid(MultiPolygon(bandage_polygon))
+    #
+    # wrap_gcs_coords = Kr.parse_mask('/Users/pvelmuru/Desktop/bandage wrap.kml')
+    # wrap_polygon = [Polygon(Conversions.gcs_list_to_cartesian(coords)) for coords in wrap_gcs_coords]
+    # wrap_multipolygon = shapely.make_valid(MultiPolygon(wrap_polygon))
+    #
+    # modified_bandage = shapely.symmetric_difference(bandage_multipolygon, wrap_multipolygon)
+    #
+    # # KmlTester.create_file_multipolygon(modified_bandage)
+    # # breakpoint()
+    # land_multipolygon = shapely.unary_union([land_multipolygon, modified_bandage])
+    # land_multipolygon = shapely.make_valid(land_multipolygon)
+    # UNION
 
     new_land_multipolygon = Intersections.modify_land_mask(land_multipolygon, mask_multipolygon)  # RETURNS back GCS
     new_land_cart = [Polygon(Conversions.gcs_list_to_cartesian(polygon.exterior.coords))
@@ -61,8 +80,10 @@ def main():
 
         segments = Pg.segmentation(mask_multipolygon, new_land_final_multi, orbit_line)
 
-        segments_clean = Pg.merge_touching_segments(segments)
-        segments_clean = Pg.remove_insignificant_segments(segments_clean)
+        if rgt == 778:
+            print('778')
+        segments_clean = Pg.remove_insignificant_segments(segments)
+        segments_clean = Pg.merge_touching_segments(segments_clean)
         segments_clean = Pg.sort_segments_by_coordinates(segments_clean,
                                                          Conversions.gcs_to_cartesian(start_latitude, start_longitude))
         segments = Pg.remove_segments_under_thresh(segments_clean)

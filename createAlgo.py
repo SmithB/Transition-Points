@@ -26,6 +26,7 @@ def validate_points(segments, rgt):
                         break
                     else:
                         # Not too sure tbh
+                        segments[i].points = []
                         print('ERROR 8')
                         break
                 else:
