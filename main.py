@@ -5,10 +5,8 @@ import Conversions
 from shapely import LineString, MultiPolygon, Polygon, MultiLineString, Point
 import shapely
 import PointerGenerator as Pg
-from Segment import Segment, State
+from Segment import State
 import CsvHandler as Ch
-import algo
-import newAlgo
 import createAlgo
 import os
 
@@ -25,29 +23,10 @@ def main():
     print(list(land_polygon_cart[0].exterior.coords))
     land_multipolygon = shapely.make_valid(MultiPolygon(land_polygon_cart))
 
-    # bandage_gcs_coords = Kr.parse_mask('/Users/pvelmuru/Desktop/bandage.kml')
-    # print(bandage_gcs_coords)
-    # bandage_polygon = [Polygon(Conversions.gcs_list_to_cartesian(coords)) for coords in bandage_gcs_coords]
-    # print(list(bandage_polygon[0].exterior.coords))
-    # bandage_multipolygon = shapely.make_valid(MultiPolygon(bandage_polygon))
-    #
-    # wrap_gcs_coords = Kr.parse_mask('/Users/pvelmuru/Desktop/bandage wrap.kml')
-    # wrap_polygon = [Polygon(Conversions.gcs_list_to_cartesian(coords)) for coords in wrap_gcs_coords]
-    # wrap_multipolygon = shapely.make_valid(MultiPolygon(wrap_polygon))
-    #
-    # modified_bandage = shapely.symmetric_difference(bandage_multipolygon, wrap_multipolygon)
-    #
-    # # KmlTester.create_file_multipolygon(modified_bandage)
-    # # breakpoint()
-    # land_multipolygon = shapely.unary_union([land_multipolygon, modified_bandage])
-    # land_multipolygon = shapely.make_valid(land_multipolygon)
-    # UNION
-
     new_land_multipolygon = Intersections.modify_land_mask(land_multipolygon, mask_multipolygon)  # RETURNS back GCS
     new_land_cart = [Polygon(Conversions.gcs_list_to_cartesian(polygon.exterior.coords))
                      for polygon in new_land_multipolygon.geoms]
     new_land_final_multi = shapely.make_valid(MultiPolygon(new_land_cart))
-    # new_land_final_multi = shapely.make_valid(new_land_final_multi)
 
     dir_name = '/Users/pvelmuru/Downloads/IS2_RGTs_cycle12_date_time'
     ext = '.kml'
@@ -66,10 +45,6 @@ def main():
     points_dict = Ch.read_csv('/Users/pvelmuru/PycharmProjects/Transistion Points/RGT_transition_locations_V2.0 1.csv',
                               points_dict)
 
-    # for point in points_dict[664]:
-    #     print(point.state)
-    # breakpoint()
-
     rgt = 1  # Do not forget the sort -- will sort backwards otherwise
     start_latitude = 0.0279589282518
     start_longitude = -0.131847178124
@@ -86,13 +61,6 @@ def main():
                                                          Conversions.gcs_to_cartesian(start_latitude, start_longitude))
         segments = Pg.remove_segments_under_thresh(segments_clean)
         segments = Pg.merge_rgt_ocean(segments)
-
-        # for segment in segments:
-        #     print(segment.state)
-
-        # for point in points_dict[rgt]:
-        #     print('point: ', point.longitude, point.latitude)
-
         segments = Pg.assign_points(rgt, points_dict, segments)
 
         for i in range(len(segments)):
@@ -112,37 +80,14 @@ def main():
             print(point_list)
 
         points_dict[rgt] = []
-        # for segment in segments:  --- does all points, though ideally there is only one per segment
-        #     for point in segment.points:
-        #         points_dict[rgt].append(point)
         for segment in segments:
             if len(segment.points) != 0:
                 for point in segment.points:
                     points_dict[rgt].append(point)
-                # if rgt == 432:
-                #     return
-                    # print(len(segment.points))
-                    # print(Conversions.cartesian_to_gcs(segment.points[0].latitude, segment.points[0].longitude))
+
 
         # test code
         print(f'rgt {rgt}: {start_latitude}   {start_longitude}')
-        # if rgt == 237:
-        #     print(f'start: {start_latitude}   {start_longitude}')
-        #     # test(segments)
-        #     print('why')
-        #     for point in points_dict[802]:
-        #         print(Conversions.cartesian_to_gcs(point.latitude, point.longitude))
-        #     return
-
-        # for segment in segments:
-        #     if len(segment.points) != 0:
-        #         # print(segment.points[0].longitude, segment.points[0].latitude)
-        #         print(Conversions.cartesian_to_gcs(segment.points[0].latitude, segment.points[0].longitude))
-
-        # if rgt == 54:
-        #     # test(segments)
-        #     # print(segments[4].line_string.coords[0])
-        #     return
 
         rgt += 1
         cart_coords = list(orbit_line.coords)[-1]
