@@ -7,7 +7,7 @@ import shapely
 import PointerGenerator as Pg
 from Segment import State
 import CsvHandler as Ch
-import createAlgo
+import algo
 import os
 
 
@@ -16,11 +16,8 @@ def main():
     mask_polygons_cart = [Polygon(Conversions.gcs_list_to_cartesian(coords)) for coords in mask_gcs_coords]
     mask_multipolygon = shapely.make_valid(MultiPolygon(mask_polygons_cart))
 
-    # land_gcs_coords = Kr.parse_mask('/Users/pvelmuru/PycharmProjects/Transistion Points/assets/land_mask.kml')
     land_gcs_coords = Kr.parse_mask( '/Users/pvelmuru/Desktop/accurate_land_mask/better/accurate_land_mask_better.kml')
-    print(land_gcs_coords)
     land_polygon_cart = [Polygon(Conversions.gcs_list_to_cartesian(coordinates)) for coordinates in land_gcs_coords]
-    print(list(land_polygon_cart[0].exterior.coords))
     land_multipolygon = shapely.make_valid(MultiPolygon(land_polygon_cart))
 
     new_land_multipolygon = Intersections.modify_land_mask(land_multipolygon, mask_multipolygon)  # RETURNS back GCS
@@ -70,7 +67,7 @@ def main():
                 point_list.append(point.state)
             print(point_list)
 
-        segments = createAlgo.validate_points(segments, rgt)
+        segments = algo.validate_points(segments, rgt)
 
         for i in range(len(segments)):
             print(i)
