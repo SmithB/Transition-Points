@@ -56,12 +56,8 @@ def cartesian_to_gcs(x, y):
 def get_geodesic_length(line_obj):
     """
     This function gets the geodesic length of a LineString object in km
-    :param line_obj: LineString object
+    :param line_obj: LineString object with GCS Coordinates
     :return: Geodesic length of the line in kilometers
     """
     geod = Geod(ellps="WGS84")
     return geod.geometry_length(line_obj) / 1000
-
-
-line = LineString(((-176.63,10.54), (-179.63, 12.13)))
-print(get_geodesic_length(line))

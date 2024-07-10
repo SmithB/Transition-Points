@@ -1,10 +1,11 @@
 from shapely import LineString, Polygon, MultiPolygon
+import shapely
 import Conversions
 
 
 def find_intersections(geometry1, geometry2):
     # TODO remove function?
-    intersection = geometry1.intersection(geometry2)
+    intersection = shapely.make_valid(geometry1.intersection(geometry2))
     return intersection
 
 

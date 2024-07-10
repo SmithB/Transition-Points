@@ -241,7 +241,7 @@ def validate_points(segments, rgt):
                 push_up(segments[i - 1])
         i += 1
 
-    if len(segments[len(segments) - 2].points) == 0: # TODO add error checking for if there is only one segment
+    if len(segments[len(segments) - 2].points) == 0:  # TODO add error checking for if there is only one segment
         print("creating")
         state = TypePoint.VEGETATION
         if segments[i].state == State.RGT:

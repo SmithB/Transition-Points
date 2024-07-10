@@ -76,12 +76,10 @@ def main():
     for file in file_list:
         orbit_gcs = Kr.get_coordinates_from_kml(dir_name + '/' + file)
         orbit_cart = Conversions.gcs_list_to_cartesian(orbit_gcs)
-        orbit_line = LineString(orbit_cart)
+        orbit_line = shapely.make_valid(LineString(orbit_cart))
 
         segments = Pg.segmentation(mask_multipolygon, new_land_final_multi, orbit_line)
 
-        if rgt == 778:
-            print('778')
         segments_clean = Pg.remove_insignificant_segments(segments)
         segments_clean = Pg.merge_touching_segments(segments_clean)
         segments_clean = Pg.sort_segments_by_coordinates(segments_clean,
@@ -97,8 +95,6 @@ def main():
 
         segments = Pg.assign_points(rgt, points_dict, segments)
 
-        # TODO ensure coordinates are of right units
-        # must happen soon
         for i in range(len(segments)):
             print(i)
             point_list = []
@@ -143,6 +139,11 @@ def main():
         #         # print(segment.points[0].longitude, segment.points[0].latitude)
         #         print(Conversions.cartesian_to_gcs(segment.points[0].latitude, segment.points[0].longitude))
 
+        # if rgt == 54:
+        #     # test(segments)
+        #     # print(segments[4].line_string.coords[0])
+        #     return
+
         rgt += 1
         cart_coords = list(orbit_line.coords)[-1]
         print(cart_coords)
@@ -150,6 +151,8 @@ def main():
         start_latitude = gcs_coords[1]
         start_longitude = gcs_coords[0]
         print(f'rgt {rgt}: last coords: {start_latitude} {start_longitude}')
+
+    Pg.remove_twilight_points(points_dict)
 
     Ch.write_csv('/Users/pvelmuru/Desktop/testwrite.csv', points_dict)
 

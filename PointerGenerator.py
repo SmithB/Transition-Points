@@ -105,6 +105,7 @@ def sort_segments_by_coordinates(segments, starting_coordinate):
     """
     sorted_segments = []
     current_coordinate = starting_coordinate
+    print(' coordinate', Conversions.cartesian_to_gcs(current_coordinate[0], current_coordinate[1]))
 
     while segments:
         next_segment = None
@@ -112,8 +113,21 @@ def sort_segments_by_coordinates(segments, starting_coordinate):
         min_distance = float('inf')
         for i, segment in enumerate(segments):
             line = segment.line_string
-            start_dist = Point(current_coordinate).distance(Point(line.coords[0][0], line.coords[0][1]))
-            end_dist = Point(current_coordinate).distance(Point(line.coords[-1][0], line.coords[-1][1]))
+            # start_dist = Point(current_coordinate).distance(Point(line.coords[0][0], line.coords[0][1]))
+            # end_dist = Point(current_coordinate).distance(Point(line.coords[-1][0], line.coords[-1][1]))
+            #
+            # print(line.coords[0][0], line.coords[0][1])
+            # print(end_dist)
+
+            curr_x, curr_y = Conversions.cartesian_to_gcs(current_coordinate[0], current_coordinate[1])
+
+            start_line = LineString((Point(curr_x, curr_y), Point(Conversions.cartesian_to_gcs(line.coords[0][0], line.coords[0][1]))))
+            end_line = LineString((Point(curr_x, curr_y), Point(Conversions.cartesian_to_gcs(line.coords[-1][0], line.coords[-1][1]))))
+
+            start_dist = Conversions.get_geodesic_length(start_line)
+            end_dist = Conversions.get_geodesic_length(end_line)
+            print(start_dist)
+            print(end_dist)
 
             if start_dist < min_distance:
                 min_distance = start_dist
@@ -126,6 +140,7 @@ def sort_segments_by_coordinates(segments, starting_coordinate):
                 index = i
         if next_segment:
             current_coordinate = next_segment.line_string.coords[-1]
+            print(f' {i} coordinate', Conversions.cartesian_to_gcs(current_coordinate[0], current_coordinate[1]))
             sorted_segments.append(next_segment)
             segments.pop(index)
         else:
@@ -241,3 +256,32 @@ def merge_rgt_ocean(segments):
             segments_clean.append(segments[i])
 
     return segments_clean
+
+
+def remove_twilight_points(points_dict):
+    for rgt in range(1, 1388):
+
+        i = 0
+        while i < len(points_dict[rgt]):
+            point = points_dict[rgt][i]
+            longitude, latitude = Conversions.cartesian_to_gcs(point.longitude, point.latitude)
+            if longitude > 179.888:
+                if -33.49 <= latitude <= 10.27185:  # turn into constants
+                    points_dict[rgt].pop(i)
+                    i -= 1
+                    print('popping')
+            elif longitude < -179.888:
+                if -33.49 <= latitude <= 10.27185:
+                    points_dict[rgt].pop(i)
+                    i -= 1
+                    print('popped')
+
+            i += 1
+
+    return points_dict
+
+#
+# point_dict = {}
+# point_dict[23] = [Pt.Point(23, State.OCEAN, -32.21084619, 179.98881075632468)]
+# remove_twilight_points(point_dict)
+# print(point_dict[23])
