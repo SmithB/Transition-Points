@@ -85,7 +85,7 @@ def test_rgt_and_mask_intersection():
         print(i)
         print(segments[i].points)
 
-    segments = createAlgo.validate_points(segments, rgt)
+    segments = algo.validate_points(segments, rgt)
 
     points_dict[rgt] = []
     # for segment in segments:

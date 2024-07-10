@@ -82,7 +82,6 @@ def main():
                 for point in segment.points:
                     points_dict[rgt].append(point)
 
-
         # test code
         print(f'rgt {rgt}: {start_latitude}   {start_longitude}')
 
@@ -95,6 +94,7 @@ def main():
         print(f'rgt {rgt}: last coords: {start_latitude} {start_longitude}')
 
     Pg.remove_twilight_points(points_dict)
+    Pg.remove_duplicate_points(points_dict)
 
     Ch.write_csv('/Users/pvelmuru/Desktop/testwrite.csv', points_dict)
 

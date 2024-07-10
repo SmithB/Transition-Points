@@ -263,3 +263,29 @@ def remove_twilight_points(points_dict):
                     i -= 1
 
             i += 1
+
+
+def remove_duplicate_points(points_dict):
+    """
+    Removes Duplicate Points that have no effect on transitions
+    :param points_dict: dictionary that contains all transition points
+    """
+    for rgt in range(1, 1388):
+        i = 0
+        last_point = None
+        while i < len(points_dict[rgt]):
+            curr_point = points_dict[rgt][i]
+            if last_point is None:
+                last_point = points_dict[rgt][i]
+
+            else:
+                if last_point.latitude == curr_point.latitude and last_point.longitude == curr_point.longitude:
+                    points_dict[rgt].pop(i)
+                    points_dict[rgt].pop(i - 1)
+                    last_point = None
+                    i -= 2
+
+                else:
+                    last_point = points_dict[rgt][i]
+
+            i += 1
