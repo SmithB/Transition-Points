@@ -113,12 +113,6 @@ def sort_segments_by_coordinates(segments, starting_coordinate):
         min_distance = float('inf')
         for i, segment in enumerate(segments):
             line = segment.line_string
-            # start_dist = Point(current_coordinate).distance(Point(line.coords[0][0], line.coords[0][1]))
-            # end_dist = Point(current_coordinate).distance(Point(line.coords[-1][0], line.coords[-1][1]))
-            #
-            # print(line.coords[0][0], line.coords[0][1])
-            # print(end_dist)
-
             curr_x, curr_y = Conversions.cartesian_to_gcs(current_coordinate[0], current_coordinate[1])
 
             start_line = LineString((Point(curr_x, curr_y), Point(Conversions.cartesian_to_gcs(line.coords[0][0], line.coords[0][1]))))
@@ -204,15 +198,6 @@ def remove_insignificant_segments(segments):
     return clean_segments
 
 
-# TODO create this function maybe
-# Overlap is minimal, test more and see if the issue really needs to be taken care of or it is fine
-def modify_overlaps(segments):  # This might have to be called after remove_insignificant_segments(segments)
-
-    print('todo')
-
-
-
-
 def assign_points(rgt, points_dict, segments):
     """
     Assigns unmodified transition points to the given segment based on it points are a segment
@@ -259,8 +244,11 @@ def merge_rgt_ocean(segments):
 
 
 def remove_twilight_points(points_dict):
+    """
+    Removes extraneous points that were generated near 180 and -180 degrees longitude
+    :param points_dict: dictionary containing the transition points for each rgt
+    """
     for rgt in range(1, 1388):
-
         i = 0
         while i < len(points_dict[rgt]):
             point = points_dict[rgt][i]
@@ -269,19 +257,9 @@ def remove_twilight_points(points_dict):
                 if -33.49 <= latitude <= 10.27185:  # turn into constants
                     points_dict[rgt].pop(i)
                     i -= 1
-                    print('popping')
             elif longitude < -179.888:
                 if -33.49 <= latitude <= 10.27185:
                     points_dict[rgt].pop(i)
                     i -= 1
-                    print('popped')
 
             i += 1
-
-    return points_dict
-
-#
-# point_dict = {}
-# point_dict[23] = [Pt.Point(23, State.OCEAN, -32.21084619, 179.98881075632468)]
-# remove_twilight_points(point_dict)
-# print(point_dict[23])
