@@ -1,6 +1,5 @@
 from shapely import Point
 
-import Conversions
 import Point as Pt
 from Segment import State
 from Point import TypePoint

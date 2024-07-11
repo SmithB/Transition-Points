@@ -1,7 +1,5 @@
 from pyproj import Transformer, Geod
 
-from shapely import LineString
-
 # Transformer objects used to convert units
 to_gcs_transform = Transformer.from_crs("EPSG:3857", "EPSG:4326")
 to_cartesian_transform = Transformer.from_crs("EPSG:4326", "EPSG:3857")

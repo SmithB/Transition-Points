@@ -289,3 +289,10 @@ def remove_duplicate_points(points_dict):
                     last_point = points_dict[rgt][i]
 
             i += 1
+
+
+def generate_transition_errors(points_dict):
+    transition_errors = []
+
+    last_point = None
+
