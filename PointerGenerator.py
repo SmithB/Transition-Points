@@ -9,47 +9,35 @@ import Point as Pt
 
 import KmlTester
 
+index = 0
 
 MIN_TRANSITION_DIST = 1100  # Kilometers
 
 
 def split_ani_meridian(rgt):
-    print(Conversions.cartesian_list_to_gcs(list(rgt.coords)))
-    # print(Conversions.gcs_list_to_cartesian([(-179.99, -89.99), (-179.99, 89.99)]))
-    # antimeridian_splitter = MultiLineString([LineString(Conversions.gcs_list_to_cartesian([(-179.99, -90), (-179.99, 90)])),
-    #                                          LineString(Conversions.gcs_list_to_cartesian([(179.99, -90), (179.99, 90)]))])
-    #
-    # line = LineString(Conversions.gcs_list_to_cartesian([(179.99, -90), (179.99, 90)]))
-    # print(Conversions.gcs_list_to_cartesian([(-24.27, 31.2), (-53.029, 37.97)]))
-    # line = LineString([(-2701724.0415527495, 3658750.2802829933), (-5903161.277276505, 4575188.685434621)])
-
-    # split_line = split(shapely.make_valid(rgt), shapely.make_valid(line))
-    #
-    # print(len(split_line.geoms))
-    #
-    # for line in split_line.geoms:
-    #     line = LineString(Conversions.cartesian_list_to_gcs(list(line.coords)))
-    #     print(Conversions.get_geodesic_length(line))
-    #
-    # multipoint = rgt.intersection(antimeridian_splitter)
-    # print('lk:', rgt.intersection(antimeridian_splitter))
-    # print(multipoint.geoms[0])
-
     # test
     coords = list(rgt.coords)
+    print(coords)
     segments = []
 
-    for i in range(1, len(coords)):
-        prev_point = coords[i - 1]
-        current_point = coords[i]
-
-        if ((prev_point[0] < -179.99 and current_point[0] > 179.99) or
-                (prev_point[0] > 179.99 and current_point[0] < -179.99)):
-            segments.append(LineString(coords[:i]))
-            segments.append(LineString(coords[i:]))
-
-    if len(segments) == 0:
-        segments = [LineString(coords)]
+    # for i in range(1, len(coords)):
+    #     prev_point = coords[i - 1]
+    #     current_point = coords[i]
+    #
+    #     if ((prev_point[0] < -179.9 and current_point[0] > 179.9) or
+    #             (prev_point[0] > 179.9 and current_point[0] < -179.9)):
+    #         print('test')
+    #         print(coords[:i])
+    #         global index
+    #         index += 1
+    #         first_half = coords[:i]
+    #         second_half = coords[i:]
+    #         segments.append(LineString(first_half)) if len(first_half) > 1 else None
+    #         segments.append(LineString(second_half)) if len(second_half) > 1 else None
+    #
+    # if len(segments) == 0:
+    #     segments = [LineString(coords)]
+    segments = [LineString(coords)]
 
     return segments
     # end test
@@ -119,7 +107,9 @@ def segmentation(rgt_mask, land_mask, rgt):  # Uses modified land Mask
 
     ocean_intersections = rgt.difference(rgt_intersections)
     ocean_intersections = ocean_intersections.difference(land_intersections)
-    ocean_intersections = MultiLineString([line_string for line_string in ocean_intersections.geoms
+    print(type(ocean_intersections))
+    if not isinstance(ocean_intersections,LineString):
+        ocean_intersections = MultiLineString([line_string for line_string in ocean_intersections.geoms
                                            if not line_string.is_closed and line_string.dwithin(rgt, 1e-8)])
 
     add_segment(ocean_intersections, State.OCEAN)

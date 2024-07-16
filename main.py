@@ -50,16 +50,14 @@ def main():
         orbit_cart = Conversions.gcs_list_to_cartesian(orbit_gcs)
         orbit_line = shapely.make_valid(LineString(orbit_cart))
 
-        segments = Pg.split_ani_meridian(orbit_line)
+        segments = Pg.split_ani_meridian(LineString(Conversions.cartesian_list_to_gcs(list(orbit_line.coords))))
 
         points_dict[rgt] = []
         print(f'{rgt} len ', len(segments))
         for i in range(len(segments)):
-            if i == 1:
-                segment1_coords = list(segments[0].coords)[-1]
-                start_longitude = - segment1_coords[0]
-                start_latitude = segment1_coords[1]
 
+            # segments_clean = Pg.segmentation(mask_multipolygon, new_land_final_multi,
+            #                                  LineString(Conversions.gcs_list_to_cartesian(list(segments[i].coords))))
             segments_clean = Pg.segmentation(mask_multipolygon, new_land_final_multi, orbit_line)
             segments_clean = Pg.remove_insignificant_segments(segments_clean)
             segments_clean = Pg.merge_touching_segments(segments_clean)
@@ -95,7 +93,7 @@ def main():
         print(f'rgt {rgt}: {start_latitude}   {start_longitude}')
 
         rgt += 1
-        cart_coords = list(orbit_line.coords)[-1]
+        cart_coords = orbit_gcs[-1]
         print(cart_coords)
         gcs_coords = Conversions.cartesian_to_gcs(cart_coords[0], cart_coords[1])
         start_longitude = gcs_coords[0]
@@ -111,6 +109,7 @@ def main():
     singular_point_errors = Pg.singular_point_errors(points_dict)
     print_transition_errors(transition_errors)
     print_transition_errors(singular_point_errors)
+    print(f'Num cross: {Pg.index}')
 
 
 def print_transition_errors(transition_errors):
