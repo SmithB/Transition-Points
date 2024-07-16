@@ -8,7 +8,7 @@ to_cartesian_transform = Transformer.from_crs("EPSG:4326", "EPSG:3857")
 def gcs_list_to_cartesian(gcs_list):
     """
     This function coverts a given list of gcs coordinates to a list of cartesian coordinates
-    :param gcs_list: list of tuples containing (latitude, longitude)
+    :param gcs_list: list of tuples containing (longitude, latitude)
     :return: list of tuples containing (x, y)
     """
     cartesian_list = []

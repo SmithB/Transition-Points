@@ -2,7 +2,7 @@ import Intersections
 import KmlReader as Kr
 import KmlTester
 import Conversions
-from shapely import LineString, MultiPolygon, Polygon, MultiLineString, Point
+from shapely import LineString, MultiPolygon, Polygon, MultiLineString
 import shapely
 import PointerGenerator as Pg
 from Segment import State
@@ -50,37 +50,46 @@ def main():
         orbit_cart = Conversions.gcs_list_to_cartesian(orbit_gcs)
         orbit_line = shapely.make_valid(LineString(orbit_cart))
 
-        segments = Pg.segmentation(mask_multipolygon, new_land_final_multi, orbit_line)
-
-        segments_clean = Pg.remove_insignificant_segments(segments)
-        segments_clean = Pg.merge_touching_segments(segments_clean)
-        segments_clean = Pg.sort_segments_by_coordinates(segments_clean,
-                                                         Conversions.gcs_to_cartesian(start_latitude, start_longitude))
-        segments = Pg.remove_segments_under_thresh(segments_clean)
-        segments = Pg.merge_rgt_ocean(segments)
-        segments = Pg.assign_points(rgt, points_dict, segments)
-
-        for i in range(len(segments)):
-            print(i)
-            point_list = []
-            for point in segments[i].points:
-                point_list.append(point.state)
-            print(point_list)
-
-        segments = algo.validate_points(segments, rgt)
-
-        for i in range(len(segments)):
-            print(i)
-            point_list = []
-            for point in segments[i].points:
-                point_list.append(point.state)
-            print(point_list)
+        segments = Pg.split_ani_meridian(orbit_line)
 
         points_dict[rgt] = []
-        for segment in segments:
-            if len(segment.points) != 0:
-                for point in segment.points:
-                    points_dict[rgt].append(point)
+        print(f'{rgt} len ', len(segments))
+        for i in range(len(segments)):
+            if i == 1:
+                segment1_coords = list(segments[0].coords)[-1]
+                start_longitude = - segment1_coords[0]
+                start_latitude = segment1_coords[1]
+
+            segments_clean = Pg.segmentation(mask_multipolygon, new_land_final_multi, orbit_line)
+            segments_clean = Pg.remove_insignificant_segments(segments_clean)
+            segments_clean = Pg.merge_touching_segments(segments_clean)
+            segments_clean = Pg.sort_segments_by_coordinates(segments_clean,
+                                                             Conversions.gcs_to_cartesian(start_latitude,
+                                                                                          start_longitude))
+            segments_clean = Pg.remove_segments_under_thresh(segments_clean)
+            segments_clean = Pg.merge_rgt_ocean(segments_clean)
+            segments_clean = Pg.assign_points(rgt, points_dict, segments_clean)
+
+            for i in range(len(segments_clean)):
+                print(i)
+                point_list = []
+                for point in segments_clean[i].points:
+                    point_list.append(point.state)
+                print(point_list)
+
+            segments_clean = algo.validate_points(segments_clean, rgt)
+
+            for i in range(len(segments_clean)):
+                print(i)
+                point_list = []
+                for point in segments_clean[i].points:
+                    point_list.append(point.state)
+                print(point_list)
+
+            for segment in segments_clean:
+                if len(segment.points) != 0:
+                    for point in segment.points:
+                        points_dict[rgt].append(point)
 
         # test code
         print(f'rgt {rgt}: {start_latitude}   {start_longitude}')
@@ -89,14 +98,27 @@ def main():
         cart_coords = list(orbit_line.coords)[-1]
         print(cart_coords)
         gcs_coords = Conversions.cartesian_to_gcs(cart_coords[0], cart_coords[1])
-        start_latitude = gcs_coords[1]
         start_longitude = gcs_coords[0]
+        start_latitude = gcs_coords[1]
         print(f'rgt {rgt}: last coords: {start_latitude} {start_longitude}')
 
     Pg.remove_twilight_points(points_dict)
     Pg.remove_duplicate_points(points_dict)
 
     Ch.write_csv('/Users/pvelmuru/Desktop/testwrite.csv', points_dict)
+
+    transition_errors = Pg.generate_transition_errors(points_dict)
+    singular_point_errors = Pg.singular_point_errors(points_dict)
+    print_transition_errors(transition_errors)
+    print_transition_errors(singular_point_errors)
+
+
+def print_transition_errors(transition_errors):
+    print('Potential Transition Errors')
+    for rgt in transition_errors:
+        print(f'Rgt: {rgt}')
+
+    print(f'Num errors: {len(transition_errors)}')
 
 
 def test(segments):

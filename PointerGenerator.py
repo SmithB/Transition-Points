@@ -2,11 +2,71 @@ from Segment import Segment, State
 import Conversions
 import Intersections
 from shapely import LineString, MultiLineString, Point
+from shapely.ops import split
 import shapely
+import Conversions
 import Point as Pt
+
+import KmlTester
 
 
 MIN_TRANSITION_DIST = 1100  # Kilometers
+
+
+def split_ani_meridian(rgt):
+    print(Conversions.cartesian_list_to_gcs(list(rgt.coords)))
+    # print(Conversions.gcs_list_to_cartesian([(-179.99, -89.99), (-179.99, 89.99)]))
+    # antimeridian_splitter = MultiLineString([LineString(Conversions.gcs_list_to_cartesian([(-179.99, -90), (-179.99, 90)])),
+    #                                          LineString(Conversions.gcs_list_to_cartesian([(179.99, -90), (179.99, 90)]))])
+    #
+    # line = LineString(Conversions.gcs_list_to_cartesian([(179.99, -90), (179.99, 90)]))
+    # print(Conversions.gcs_list_to_cartesian([(-24.27, 31.2), (-53.029, 37.97)]))
+    # line = LineString([(-2701724.0415527495, 3658750.2802829933), (-5903161.277276505, 4575188.685434621)])
+
+    # split_line = split(shapely.make_valid(rgt), shapely.make_valid(line))
+    #
+    # print(len(split_line.geoms))
+    #
+    # for line in split_line.geoms:
+    #     line = LineString(Conversions.cartesian_list_to_gcs(list(line.coords)))
+    #     print(Conversions.get_geodesic_length(line))
+    #
+    # multipoint = rgt.intersection(antimeridian_splitter)
+    # print('lk:', rgt.intersection(antimeridian_splitter))
+    # print(multipoint.geoms[0])
+
+    # test
+    coords = list(rgt.coords)
+    segments = []
+
+    for i in range(1, len(coords)):
+        prev_point = coords[i - 1]
+        current_point = coords[i]
+
+        if ((prev_point[0] < -179.99 and current_point[0] > 179.99) or
+                (prev_point[0] > 179.99 and current_point[0] < -179.99)):
+            segments.append(LineString(coords[:i]))
+            segments.append(LineString(coords[i:]))
+
+    if len(segments) == 0:
+        segments = [LineString(coords)]
+
+    return segments
+    # end test
+
+    # for point in multipoint.geoms:
+    #     # print(list(point.coords))
+    #     print('coords: ', Conversions.cartesian_to_gcs(list(point.coords)[0][0], list(point.coords)[0][1]))
+    #
+    # num = len(split_line.geoms)
+    # print(num)
+    #
+    # print('split type:', type(split_line.geoms[0]))
+    # KmlTester.create_file_multiline(split_line)
+
+    # if num != 1:
+    #     print(num)
+    #     print('omg')
 
 
 def segmentation(rgt_mask, land_mask, rgt):  # Uses modified land Mask
@@ -296,3 +356,31 @@ def generate_transition_errors(points_dict):
 
     last_point = None
 
+    for rgt in range(1, 1388):
+        for i in range(len(points_dict[rgt])):
+            point = points_dict[rgt][i]
+            if last_point is None:
+                last_point = point
+
+            else:
+                if last_point.state == point.state:
+
+                    if i == 0:
+                        transition_errors.append(f'{last_point.rgt} or {rgt}')
+                    else:
+                        transition_errors.append(f'{rgt}')
+
+                last_point = point
+
+    return transition_errors
+
+
+def singular_point_errors(points_dict):
+    transition_errors = []
+
+    for rgt in range(1, 1388):
+        num_points = len(points_dict[rgt])
+        if num_points <= 1:
+            transition_errors.append(rgt)
+
+    return transition_errors

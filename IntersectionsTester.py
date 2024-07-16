@@ -10,13 +10,14 @@ import CsvHandler as Ch
 import algo
 
 
-# TODO find out where this code should go in main
 def test_rgt_and_mask_intersection():
-    rgt = 334  # Do not forget the sort -- will sort backwards otherwise
-    current_state = State.RGT
-    orbit_gcs = Kr.get_coordinates_from_kml('/Users/pvelmuru/Downloads/IS2_RGTs_cycle12_date_time/IS2_RGT_0334_cycle12_15-Jul-2021.kml')
+    rgt = 534  # Do not forget the sort -- will sort backwards otherwise
+    orbit_gcs = Kr.get_coordinates_from_kml('/Users/pvelmuru/Downloads/IS2_RGTs_cycle12_date_time/IS2_RGT_0534_cycle12_28-Jul-2021.kml')
     orbit_cart = Conversions.gcs_list_to_cartesian(orbit_gcs)
     orbit_line = LineString(orbit_cart)
+
+    Pg.split_ani_meridian(orbit_line)
+    return
 
     mask_gcs_coords = Kr.parse_mask('/Users/pvelmuru/Desktop/snow_depth_mask.kml')
     mask_polygons_cart = [Polygon(Conversions.gcs_list_to_cartesian(coords)) for coords in mask_gcs_coords]

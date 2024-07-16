@@ -1,11 +1,12 @@
-from shapely import Point
+from shapely import Point, LineString
 
+import Conversions
 import Point as Pt
 from Segment import State
 from Point import TypePoint
 
 
-TOLERANCE = 10  # roughly .0100 km
+TOLERANCE = 1000  # km
 
 
 def validate_points(segments, rgt):
@@ -20,7 +21,7 @@ def validate_points(segments, rgt):
                 if len(segments[i - 1].points) == 0:
                     if segments[i].state.value == segments[i].points[0].state.value:
                         segments[i - 1].points.append(segments[i].points[0])
-                        segments[i - 1] = push_up(segments[i - 1])
+                        push_up(segments[i - 1])
                         segments[i].points.pop(0)
                         break
                     else:
@@ -53,12 +54,12 @@ def validate_points(segments, rgt):
                     if len(segments[i - 1].points) < 2:  # Accounts for cases where the first segment needs two points
                         segments[i - 1].points.append(segments[i].points[0])
                         segments[i].points.pop(0)
-                        segments[i - 1] = push_up(segments[i - 1])
+                        push_up(segments[i - 1])
                 else:
-                    segments[i] = push_up(segments[i])
+                    push_up(segments[i])
             else:
                 if segments[i].points[0].state.value != segments[i].state.value:
-                    segments[i] = push_up(segments[i])
+                    push_up(segments[i])
 
         elif num_points == 2:
             if i == 1:
@@ -155,7 +156,7 @@ def validate_points(segments, rgt):
                     if segments[i].state.value == segments[i].points[0].state.value:
                         segments[i - 1].points.append(segments[i].points[0])
                         segments[i].points.pop(0)
-                        segments[i - 1] = push_up(segments[i - 1])
+                        push_up(segments[i - 1])
                         continue
                     else:
                         print('ERROR 6')  # Rendering issue???
@@ -249,19 +250,24 @@ def validate_points(segments, rgt):
         push_up(segments[i - 1])
     return segments
 
-
+optimized = True
 def push_up(segment):
     point = Point([segment.points[-1].longitude, segment.points[-1].latitude])
     segment_endpoint = Point(segment.line_string.coords[-1])
 
-    # TODO create LineString and calculate distance that way
+    distance = point.distance(segment_endpoint)
 
-    if point.distance(segment_endpoint) > TOLERANCE:
+    if optimized:
+        point_x, point_y = Conversions.cartesian_to_gcs(point.coords[0][0], point.coords[0][1])
+        print('double: ', point.coords[0][0], point.coords[0][1])
+        endpoint_x, endpoint_y = Conversions.cartesian_to_gcs(segment_endpoint.coords[0][0], segment_endpoint.coords[0][1])
+        print('triple: ', segment_endpoint.coords[0][0], segment_endpoint.coords[0][1])
+        distance = Conversions.get_geodesic_length(LineString(((point_x, point_y), (endpoint_x, endpoint_y))))
+
+    if distance > TOLERANCE:
         new_x = list(segment_endpoint.coords)[0][0]
         new_y = list(segment_endpoint.coords)[0][1]
 
         segment.points[-1] = Pt.Point(segment.points[-1].rgt, segment.points[-1].state, new_y, new_x, segment.points[-1].asc_req)
     else:
         print('meets tolerance')
-
-    return segment
