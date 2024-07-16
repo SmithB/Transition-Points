@@ -17,26 +17,25 @@ MIN_TRANSITION_DIST = 1100  # Kilometers
 def split_ani_meridian(rgt):
     # test
     coords = list(rgt.coords)
-    print(coords)
     segments = []
 
-    # for i in range(1, len(coords)):
-    #     prev_point = coords[i - 1]
-    #     current_point = coords[i]
-    #
-    #     if ((prev_point[0] < -179.9 and current_point[0] > 179.9) or
-    #             (prev_point[0] > 179.9 and current_point[0] < -179.9)):
-    #         print('test')
-    #         print(coords[:i])
-    #         global index
-    #         index += 1
-    #         first_half = coords[:i]
-    #         second_half = coords[i:]
-    #         segments.append(LineString(first_half)) if len(first_half) > 1 else None
-    #         segments.append(LineString(second_half)) if len(second_half) > 1 else None
-    #
-    # if len(segments) == 0:
-    #     segments = [LineString(coords)]
+    for i in range(1, len(coords)):
+        prev_point = coords[i - 1]
+        current_point = coords[i]
+
+        if ((prev_point[0] < -179.9 and current_point[0] > 179.9) or
+                (prev_point[0] > 179.9 and current_point[0] < -179.9)):
+            # print('test')
+            # print(coords[:i])
+            global index
+            index += 1
+            first_half = coords[:i]
+            second_half = coords[i:]
+            segments.append(LineString(first_half)) if len(first_half) > 1 else None
+            segments.append(LineString(second_half)) if len(second_half) > 1 else None
+
+    if len(segments) == 0:
+        segments = [LineString(coords)]
     segments = [LineString(coords)]
 
     return segments

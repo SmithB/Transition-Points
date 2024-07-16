@@ -95,7 +95,7 @@ def main():
         rgt += 1
         cart_coords = orbit_gcs[-1]
         print(cart_coords)
-        gcs_coords = Conversions.cartesian_to_gcs(cart_coords[0], cart_coords[1])
+        gcs_coords = cart_coords[0], cart_coords[1]
         start_longitude = gcs_coords[0]
         start_latitude = gcs_coords[1]
         print(f'rgt {rgt}: last coords: {start_latitude} {start_longitude}')
