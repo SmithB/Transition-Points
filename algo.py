@@ -262,9 +262,7 @@ def push_up(segment):
 
     if OPTIMIZED:
         point_x, point_y = Conversions.cartesian_to_gcs(point.coords[0][0], point.coords[0][1])
-        print('double: ', point.coords[0][0], point.coords[0][1])
         endpoint_x, endpoint_y = Conversions.cartesian_to_gcs(segment_endpoint.coords[0][0], segment_endpoint.coords[0][1])
-        print('triple: ', endpoint_x, endpoint_y)
         distance = Conversions.get_geodesic_length(LineString(((point_x, point_y), (endpoint_x, endpoint_y))))
 
     if distance > TOLERANCE:
@@ -273,5 +271,4 @@ def push_up(segment):
 
         segment.points[-1] = Pt.Point(segment.points[-1].rgt, segment.points[-1].state, new_y, new_x,
                                       segment.points[-1].asc_req)
-    else:
-        print('meets tolerance')
+

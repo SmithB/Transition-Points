@@ -63,12 +63,15 @@ def main():
                                                                                           start_longitude))
             segments_clean = Pg.remove_segments_under_thresh(segments_clean)
             segments_clean = Pg.merge_rgt_ocean(segments_clean)
+            segments_clean = Pg.merge_corresponding_segments(segments_clean)
             segments_clean = Pg.assign_points(rgt, points_dict, segments_clean)
 
             segments_clean = algo.validate_points(segments_clean, rgt)
 
             points_dict[rgt] = []
+            print(f'rgt: {rgt}: ')
             for segment in segments_clean:
+                print(segment.state)
                 if len(segment.points) != 0:
                     for point in segment.points:
                         points_dict[rgt].append(point)
@@ -103,13 +106,12 @@ def main():
             segments_combined = algo.validate_points(segments_combined, rgt)
 
             points_dict[rgt] = []
+            print(f'rgt: {rgt}: ')
             for segment in segments_combined:
+                print(segment.state)
                 if len(segment.points) != 0:
                     for point in segment.points:
                         points_dict[rgt].append(point)
-
-        # test code
-        print(f'rgt {rgt}: {start_latitude}   {start_longitude}')
 
         rgt += 1
         cart_coords = orbit_gcs[-1]
@@ -130,27 +132,6 @@ def main():
     print_transition_errors(singular_point_errors)
     print(f'Num cross: {Pg.index}')
     print(Pg.crossing_rgts)
-
-    new_dict = dict()
-
-    for i in range(1, 1388):
-        new_dict[i] = 0
-
-    for i in Pg.crossing_rgts:
-        new_dict[i] += 1
-
-    new_list = []
-    normal_list = []
-    for i in new_dict:
-        if new_dict[i] == 2:
-            new_list.append(i)
-        elif new_dict[i] == 1:
-            normal_list.append(i)
-        elif new_dict[i] != 0:
-            print('noo', i)
-
-    print(f'len : {len(new_list)}: ', new_list)
-    print(f'len : {len(normal_list)}: ', normal_list)
 
 
 def print_transition_errors(transition_errors):
