@@ -52,7 +52,7 @@ def main():
 
         segments = Pg.split_ani_meridian(LineString(Conversions.cartesian_list_to_gcs(list(orbit_line.coords))))
 
-        points_dict[rgt] = []
+        # points_dict[rgt] = []
         print(f'{rgt} len ', len(segments))
 
         if len(segments) == 1:
@@ -68,6 +68,7 @@ def main():
 
             segments_clean = algo.validate_points(segments_clean, rgt)
 
+            points_dict[rgt] = []
             for segment in segments_clean:
                 if len(segment.points) != 0:
                     for point in segment.points:
@@ -102,6 +103,7 @@ def main():
 
             segments_combined = algo.validate_points(segments_combined, rgt)
 
+            points_dict[rgt] = []
             for segment in segments_combined:
                 if len(segment.points) != 0:
                     for point in segment.points:

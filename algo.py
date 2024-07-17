@@ -254,17 +254,17 @@ def validate_points(segments, rgt):
 
 
 def push_up(segment):
+    print(segment.points[-1].longitude)
     point = Point([segment.points[-1].longitude, segment.points[-1].latitude])
     segment_endpoint = Point(segment.line_string.coords[-1])
 
     distance = point.distance(segment_endpoint)
 
     if OPTIMIZED:
-        print('poinl', point.coords[0][0])
         point_x, point_y = Conversions.cartesian_to_gcs(point.coords[0][0], point.coords[0][1])
-        # print('double: ', point.coords[0][0], point.coords[0][1])
+        print('double: ', point.coords[0][0], point.coords[0][1])
         endpoint_x, endpoint_y = Conversions.cartesian_to_gcs(segment_endpoint.coords[0][0], segment_endpoint.coords[0][1])
-        # print('triple: ', segment_endpoint.coords[0][0], segment_endpoint.coords[0][1])
+        print('triple: ', endpoint_x, endpoint_y)
         distance = Conversions.get_geodesic_length(LineString(((point_x, point_y), (endpoint_x, endpoint_y))))
 
     if distance > TOLERANCE:
