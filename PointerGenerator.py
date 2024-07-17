@@ -144,6 +144,24 @@ def merge_touching_segments(segments):
     return mask_segments + land_segments + ocean_segments
 
 
+def merge_corresponding_segments(segments):
+    i = 0
+    while i < len(segments) - 1:
+        if segments[i].state == segments[i + 1].state:
+            segment1 = segments[i].line_string
+            segment2 = segments[i + 1].line_string
+            merge_coords = list(segment1.coords)[:-1] + list(segment2.coords)
+            new_length = segments[i].length + segments[i + 1].length
+            new_segment = Segment(LineString(merge_coords), segments[i].state, new_length)
+            segments[i] = new_segment
+            segments.pop(i + 1)
+            continue
+
+        i += 1
+
+    return segments
+
+
 def sort_segments_by_coordinates(segments, starting_coordinate):
     """
     Sorts segments in order starting from the given starting coordinate
@@ -153,7 +171,7 @@ def sort_segments_by_coordinates(segments, starting_coordinate):
     """
     sorted_segments = []
     current_coordinate = starting_coordinate
-    print(' coordinate', Conversions.cartesian_to_gcs(current_coordinate[0], current_coordinate[1]))
+    # print(' coordinate', Conversions.cartesian_to_gcs(current_coordinate[0], current_coordinate[1]))
 
     while segments:
         next_segment = None
@@ -168,8 +186,8 @@ def sort_segments_by_coordinates(segments, starting_coordinate):
 
             start_dist = Conversions.get_geodesic_length(start_line)
             end_dist = Conversions.get_geodesic_length(end_line)
-            print(start_dist)
-            print(end_dist)
+            # print(start_dist)
+            # print(end_dist)
 
             if start_dist < min_distance:
                 min_distance = start_dist

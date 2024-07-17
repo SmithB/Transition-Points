@@ -45,7 +45,7 @@ def cartesian_to_gcs(x, y):
     This function converts the given x and y coordinates to latitude and longitude
     :param x: x coordinate of EPSG:3857 format
     :param y: y coordinate of EPSG:3857 format
-    :return: tuple of (latitude, longitude) of EPSG:4326
+    :return: tuple of (longitude, latitude) of EPSG:4326
     """
     gcs_coordinates = to_gcs_transform.transform(x, y)
     return tuple((gcs_coordinates[1], gcs_coordinates[0]))

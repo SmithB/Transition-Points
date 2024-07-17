@@ -54,11 +54,9 @@ def main():
 
         points_dict[rgt] = []
         print(f'{rgt} len ', len(segments))
-        for i in range(len(segments)):
 
-            segments_clean = Pg.segmentation(mask_multipolygon, new_land_final_multi,
-                                             LineString(Conversions.gcs_list_to_cartesian(list(segments[i].coords))))
-            # segments_clean = Pg.segmentation(mask_multipolygon, new_land_final_multi, orbit_line)
+        if len(segments) == 1:
+            segments_clean = Pg.segmentation(mask_multipolygon, new_land_final_multi, orbit_line)
             segments_clean = Pg.remove_insignificant_segments(segments_clean)
             segments_clean = Pg.merge_touching_segments(segments_clean)
             segments_clean = Pg.sort_segments_by_coordinates(segments_clean,
@@ -68,23 +66,43 @@ def main():
             segments_clean = Pg.merge_rgt_ocean(segments_clean)
             segments_clean = Pg.assign_points(rgt, points_dict, segments_clean)
 
-            # for i in range(len(segments_clean)):
-            #     print(i)
-            #     point_list = []
-            #     for point in segments_clean[i].points:
-            #         point_list.append(point.state)
-            #     print(point_list)
-
             segments_clean = algo.validate_points(segments_clean, rgt)
-            #
-            # for i in range(len(segments_clean)):
-            #     print(i)
-            #     point_list = []
-            #     for point in segments_clean[i].points:
-            #         point_list.append(point.state)
-            #     print(point_list)
 
             for segment in segments_clean:
+                if len(segment.points) != 0:
+                    for point in segment.points:
+                        points_dict[rgt].append(point)
+
+        else:
+            segments_combined = []
+            for i in range(len(segments)):
+                print('happen')
+
+                segments_clean = Pg.segmentation(mask_multipolygon, new_land_final_multi,
+                                                 LineString(Conversions.gcs_list_to_cartesian(list(segments[i].coords))))
+                # segments_clean = Pg.segmentation(mask_multipolygon, new_land_final_multi, orbit_line)
+                segments_clean = Pg.remove_insignificant_segments(segments_clean)
+                segments_clean = Pg.merge_touching_segments(segments_clean)
+                segments_clean = Pg.sort_segments_by_coordinates(segments_clean,
+                                                                 Conversions.gcs_to_cartesian(start_latitude,
+                                                                                              start_longitude))
+                segments_clean = Pg.remove_segments_under_thresh(segments_clean)
+                segments_clean = Pg.merge_rgt_ocean(segments_clean)
+
+                segments_combined.extend(segments_clean)
+
+                coordinates = Conversions.cartesian_to_gcs(list(segments_combined[-1].line_string.coords)[-1][0],
+                                                           list(segments_combined[-1].line_string.coords)[-1][1])
+                start_longitude = - coordinates[0]
+                start_latitude = coordinates[1]
+                print('lats: ', start_longitude, start_latitude)
+
+            segments_combined = Pg.merge_corresponding_segments(segments_combined)
+            segments_combined = Pg.assign_points(rgt, points_dict, segments_combined)
+
+            segments_combined = algo.validate_points(segments_combined, rgt)
+
+            for segment in segments_combined:
                 if len(segment.points) != 0:
                     for point in segment.points:
                         points_dict[rgt].append(point)
