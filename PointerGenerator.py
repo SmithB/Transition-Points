@@ -36,7 +36,6 @@ def split_ani_meridian(rgt):
 
     if len(segments) == 0:
         segments = [LineString(coords)]
-    segments = [LineString(coords)]
 
     return segments
     # end test
@@ -303,11 +302,11 @@ def remove_twilight_points(points_dict):
             point = points_dict[rgt][i]
             longitude, latitude = Conversions.cartesian_to_gcs(point.longitude, point.latitude)
             if longitude > 179.888:
-                if -33.49 <= latitude <= 10.27185:  # turn into constants
+                if -88 <= latitude <= 88:  # turn into constants
                     points_dict[rgt].pop(i)
                     i -= 1
             elif longitude < -179.888:
-                if -33.49 <= latitude <= 10.27185:
+                if -88 <= latitude <= 88:
                     points_dict[rgt].pop(i)
                     i -= 1
 

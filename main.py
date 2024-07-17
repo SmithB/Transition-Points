@@ -56,9 +56,9 @@ def main():
         print(f'{rgt} len ', len(segments))
         for i in range(len(segments)):
 
-            # segments_clean = Pg.segmentation(mask_multipolygon, new_land_final_multi,
-            #                                  LineString(Conversions.gcs_list_to_cartesian(list(segments[i].coords))))
-            segments_clean = Pg.segmentation(mask_multipolygon, new_land_final_multi, orbit_line)
+            segments_clean = Pg.segmentation(mask_multipolygon, new_land_final_multi,
+                                             LineString(Conversions.gcs_list_to_cartesian(list(segments[i].coords))))
+            # segments_clean = Pg.segmentation(mask_multipolygon, new_land_final_multi, orbit_line)
             segments_clean = Pg.remove_insignificant_segments(segments_clean)
             segments_clean = Pg.merge_touching_segments(segments_clean)
             segments_clean = Pg.sort_segments_by_coordinates(segments_clean,
@@ -68,21 +68,21 @@ def main():
             segments_clean = Pg.merge_rgt_ocean(segments_clean)
             segments_clean = Pg.assign_points(rgt, points_dict, segments_clean)
 
-            for i in range(len(segments_clean)):
-                print(i)
-                point_list = []
-                for point in segments_clean[i].points:
-                    point_list.append(point.state)
-                print(point_list)
+            # for i in range(len(segments_clean)):
+            #     print(i)
+            #     point_list = []
+            #     for point in segments_clean[i].points:
+            #         point_list.append(point.state)
+            #     print(point_list)
 
             segments_clean = algo.validate_points(segments_clean, rgt)
-
-            for i in range(len(segments_clean)):
-                print(i)
-                point_list = []
-                for point in segments_clean[i].points:
-                    point_list.append(point.state)
-                print(point_list)
+            #
+            # for i in range(len(segments_clean)):
+            #     print(i)
+            #     point_list = []
+            #     for point in segments_clean[i].points:
+            #         point_list.append(point.state)
+            #     print(point_list)
 
             for segment in segments_clean:
                 if len(segment.points) != 0:
