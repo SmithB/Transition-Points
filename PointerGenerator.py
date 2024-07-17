@@ -1,8 +1,6 @@
 from Segment import Segment, State
-import Conversions
 import Intersections
 from shapely import LineString, MultiLineString, Point
-from shapely.ops import split
 import shapely
 import Conversions
 import Point as Pt
