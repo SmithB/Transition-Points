@@ -1,6 +1,7 @@
 import random
 from shapely import LineString
 
+
 rgts = []
 
 while len(rgts) != 40:
@@ -11,4 +12,7 @@ rgts.sort()
 print(rgts)
 
 
-LineString((-179.9985612572251, 0.002678469888111313))
+# LineString((-179.9985612572251, 0.002678469888111313))
+
+
+print(186+69)

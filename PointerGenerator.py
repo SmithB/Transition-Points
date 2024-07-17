@@ -8,6 +8,8 @@ import Point as Pt
 import KmlTester
 
 index = 0
+rgt_num = 0
+crossing_rgts = []
 
 MIN_TRANSITION_DIST = 1100  # Kilometers
 
@@ -17,6 +19,8 @@ def split_ani_meridian(rgt):
     coords = list(rgt.coords)
     segments = []
 
+    global rgt_num
+    rgt_num += 1
     for i in range(1, len(coords)):
         prev_point = coords[i - 1]
         current_point = coords[i]
@@ -27,6 +31,7 @@ def split_ani_meridian(rgt):
             # print(coords[:i])
             global index
             index += 1
+            crossing_rgts.append(rgt_num)
             first_half = coords[:i]
             second_half = coords[i:]
             segments.append(LineString(first_half)) if len(first_half) > 1 else None
@@ -198,7 +203,7 @@ def sort_segments_by_coordinates(segments, starting_coordinate):
                 index = i
         if next_segment:
             current_coordinate = next_segment.line_string.coords[-1]
-            print(f' {i} coordinate', Conversions.cartesian_to_gcs(current_coordinate[0], current_coordinate[1]))
+            # print(f' {i} coordinate', Conversions.cartesian_to_gcs(current_coordinate[0], current_coordinate[1]))
             sorted_segments.append(next_segment)
             segments.pop(index)
         else:

@@ -52,7 +52,6 @@ def main():
 
         segments = Pg.split_ani_meridian(LineString(Conversions.cartesian_list_to_gcs(list(orbit_line.coords))))
 
-        # points_dict[rgt] = []
         print(f'{rgt} len ', len(segments))
 
         if len(segments) == 1:
@@ -130,6 +129,28 @@ def main():
     print_transition_errors(transition_errors)
     print_transition_errors(singular_point_errors)
     print(f'Num cross: {Pg.index}')
+    print(Pg.crossing_rgts)
+
+    new_dict = dict()
+
+    for i in range(1, 1388):
+        new_dict[i] = 0
+
+    for i in Pg.crossing_rgts:
+        new_dict[i] += 1
+
+    new_list = []
+    normal_list = []
+    for i in new_dict:
+        if new_dict[i] == 2:
+            new_list.append(i)
+        elif new_dict[i] == 1:
+            normal_list.append(i)
+        elif new_dict[i] != 0:
+            print('noo', i)
+
+    print(f'len : {len(new_list)}: ', new_list)
+    print(f'len : {len(normal_list)}: ', normal_list)
 
 
 def print_transition_errors(transition_errors):
