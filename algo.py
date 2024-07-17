@@ -15,7 +15,7 @@ def validate_points(segments, rgt):
     i = 0
     while i < len(segments):
         num_points = len(segments[i].points)
-        print(i, segments[i].state)
+        print(i, num_points, segments[i].state)
 
         if i == len(segments) - 1:
 
@@ -235,7 +235,6 @@ def validate_points(segments, rgt):
 
         if i > 0:
             if len(segments[i - 1].points) == 0:
-                print("creating")
                 state = TypePoint.VEGETATION
                 if segments[i].state == State.RGT:
                     state = TypePoint.RGT
@@ -244,7 +243,6 @@ def validate_points(segments, rgt):
         i += 1
 
     if len(segments[len(segments) - 2].points) == 0:  # TODO add error checking for if there is only one segment
-        print("creating")
         state = TypePoint.VEGETATION
         if segments[i].state == State.RGT:
             state = TypePoint.RGT
@@ -254,7 +252,6 @@ def validate_points(segments, rgt):
 
 
 def push_up(segment):
-    print(segment.points[-1].longitude)
     point = Point([segment.points[-1].longitude, segment.points[-1].latitude])
     segment_endpoint = Point(segment.line_string.coords[-1])
 
@@ -271,4 +268,3 @@ def push_up(segment):
 
         segment.points[-1] = Pt.Point(segment.points[-1].rgt, segment.points[-1].state, new_y, new_x,
                                       segment.points[-1].asc_req)
-
