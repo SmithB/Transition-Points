@@ -71,7 +71,7 @@ def main():
             points_dict[rgt] = []
             print(f'rgt: {rgt}: ')
             for segment in segments_clean:
-                print(segment.state)
+                print(segment.state, segment.length)
                 if len(segment.points) != 0:
                     for point in segment.points:
                         points_dict[rgt].append(point)
@@ -108,7 +108,7 @@ def main():
             points_dict[rgt] = []
             print(f'rgt: {rgt}: ')
             for segment in segments_combined:
-                print(segment.state)
+                print(segment.state, segment.length)
                 if len(segment.points) != 0:
                     for point in segment.points:
                         points_dict[rgt].append(point)

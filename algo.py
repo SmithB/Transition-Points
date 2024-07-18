@@ -18,7 +18,6 @@ def validate_points(segments, rgt):
         print(i, num_points, segments[i].state)
 
         if i == len(segments) - 1:
-
             if 0 < num_points <= 2:
                 if len(segments[i - 1].points) == 0:
                     if segments[i].state.value == segments[i].points[0].state.value:
@@ -63,6 +62,9 @@ def validate_points(segments, rgt):
                 if segments[i].points[0].state.value != segments[i].state.value:
                     push_up(segments[i])
 
+                else:
+                    segments[i].points[0].endpoint = False
+
         elif num_points == 2:
             if i == 1:
                 if len(segments[0].points) < 2:
@@ -80,7 +82,8 @@ def validate_points(segments, rgt):
             elif i == 0:
                 if segments[i].points[0].state.value == segments[i].state.value:
                     # This means this point transitions for this segment
-                    push_up(segments[i])
+                    # push_up(segments[i])
+                    segments[i].points[0].endpoint = False
                 else:
                     if i < len(segments) - 1:
                         if segments[i].points[1].state.value == segments[i].state.value:
@@ -238,16 +241,20 @@ def validate_points(segments, rgt):
                 state = TypePoint.VEGETATION
                 if segments[i].state == State.RGT:
                     state = TypePoint.RGT
-                segments[i - 1].points.append(Pt.Point(rgt, state, 1, 1, -1))  # NEED to generate asc_req
+                segments[i - 1].points.append(Pt.Point(rgt, state, 1, 1))  # NEED to generate asc_req
                 push_up(segments[i - 1])
+
         i += 1
 
     if len(segments[len(segments) - 2].points) == 0:  # TODO add error checking for if there is only one segment
         state = TypePoint.VEGETATION
         if segments[i].state == State.RGT:
             state = TypePoint.RGT
-        segments[i - 1].points.append(Pt.Point(rgt, state, 1, 1, -1))  # NEED to generate asc_req
+        segments[i - 1].points.append(Pt.Point(rgt, state, 1, 1))  # NEED to generate asc_req
         push_up(segments[i - 1])
+
+    add_endpoint(segments)
+
     return segments
 
 
@@ -268,3 +275,16 @@ def push_up(segment):
 
         segment.points[-1] = Pt.Point(segment.points[-1].rgt, segment.points[-1].state, new_y, new_x,
                                       segment.points[-1].asc_req)
+
+
+def add_endpoint(segments):
+    i = 0
+    while i < len(segments):
+        if len(segments[i].points) == 1:
+            point = segments[i].points[0]
+            if not point.endpoint:
+                state = TypePoint.RGT if point.state == TypePoint.VEGETATION else TypePoint.VEGETATION
+                segments[i].points.append(Pt.Point(point.rgt, state, 1, 1))  # Need to generate asc_req
+                push_up(segments[i])
+
+        i += 1
