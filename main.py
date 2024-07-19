@@ -123,6 +123,7 @@ def main():
 
     Pg.remove_twilight_points(points_dict)
     Pg.remove_duplicate_points(points_dict)
+    Pg.remove_extra_endpoints(points_dict)
 
     Ch.write_csv('/Users/pvelmuru/Desktop/testwrite.csv', points_dict)
 

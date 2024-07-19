@@ -360,6 +360,19 @@ def remove_duplicate_points(points_dict):
             i += 1
 
 
+def remove_extra_endpoints(points_dict):
+    for i in range(1, 1387):
+        # if i == 250:
+        #     print(points_dict[i + 1][0].asc_req, points_dict[i][-1].endpoint)
+        #     breakpoint()
+        if points_dict[i][-1].asc_req == -1 and not points_dict[i + 1][0].endpoint:
+            points_dict[i].pop(-1)
+
+        elif (points_dict[i + 1][0].asc_req == -1 and
+              (points_dict[i][-1].state == points_dict[i + 1][0].state)):
+            points_dict[i + 1].pop(0)
+
+
 def generate_transition_errors(points_dict):
     transition_errors = []
 
