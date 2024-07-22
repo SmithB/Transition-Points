@@ -7,7 +7,6 @@ import Point as Pt
 
 import KmlTester
 
-index = 0
 rgt_num = 0
 crossing_rgts = []
 
@@ -21,41 +20,27 @@ def split_ani_meridian(rgt):
 
     global rgt_num
     rgt_num += 1
-    for i in range(1, len(coords)):
+
+    i = 1
+    while i < len(coords):
         prev_point = coords[i - 1]
         current_point = coords[i]
 
-        if ((prev_point[0] < -179.9 and current_point[0] > 179.9) or
-                (prev_point[0] > 179.9 and current_point[0] < -179.9)):
-            # print('test')
-            # print(coords[:i])
-            global index
-            index += 1
+        if ((prev_point[0] < -170 and current_point[0] > 170) or
+                (prev_point[0] > 170 and current_point[0] < -170)):
             crossing_rgts.append(rgt_num)
             first_half = coords[:i]
-            second_half = coords[i:]
+            coords = coords[i:]
             segments.append(LineString(first_half)) if len(first_half) > 1 else None
-            segments.append(LineString(second_half)) if len(second_half) > 1 else None
 
-    if len(segments) == 0:
-        segments = [LineString(coords)]
+        i += 1
+
+    segments.append(LineString(coords)) if len(coords) > 1 else None
+
+    # if len(segments) == 0:
+    #     segments = [LineString(coords)]
 
     return segments
-    # end test
-
-    # for point in multipoint.geoms:
-    #     # print(list(point.coords))
-    #     print('coords: ', Conversions.cartesian_to_gcs(list(point.coords)[0][0], list(point.coords)[0][1]))
-    #
-    # num = len(split_line.geoms)
-    # print(num)
-    #
-    # print('split type:', type(split_line.geoms[0]))
-    # KmlTester.create_file_multiline(split_line)
-
-    # if num != 1:
-    #     print(num)
-    #     print('omg')
 
 
 def segmentation(rgt_mask, land_mask, rgt):  # Uses modified land Mask
@@ -75,7 +60,11 @@ def segmentation(rgt_mask, land_mask, rgt):  # Uses modified land Mask
     def add_segment(intersections, state):
         if type(intersections) is LineString:
             print("LINE String occurs")
-            length = Conversions.get_geodesic_length(intersections)
+            line = LineString(Conversions.cartesian_list_to_gcs(list(intersections.coords)))
+            length = Conversions.get_geodesic_length(line)
+            # if length == 0.0:
+            #     return
+            # print('LLen: ', length)
             if state is not state.OCEAN:
                 if rgt.overlaps(intersections):
                     segment = Segment(intersections, state, length)
@@ -89,11 +78,13 @@ def segmentation(rgt_mask, land_mask, rgt):  # Uses modified land Mask
                     if rgt.overlaps(intersection):
                         intersection_gcs = LineString(Conversions.cartesian_list_to_gcs(intersection.coords))
                         length = Conversions.get_geodesic_length(intersection_gcs)
+                        # print('lllen: ', length)
                         segment = Segment(intersection, state, length)
                         segments.append(segment)
                 else:
                     intersection_gcs = LineString(Conversions.cartesian_list_to_gcs(intersection.coords))
                     length = Conversions.get_geodesic_length(intersection_gcs)
+                    # print('lllllen: ', length)
                     segment = Segment(intersection, state, length)
                     segments.append(segment)
 
@@ -154,6 +145,7 @@ def merge_corresponding_segments(segments):
             segment1 = segments[i].line_string
             segment2 = segments[i + 1].line_string
             merge_coords = list(segment1.coords)[:-1] + list(segment2.coords)
+            print('lengths: ', segments[i].length, segments[i + 1].length)
             new_length = segments[i].length + segments[i + 1].length
             new_segment = Segment(LineString(merge_coords), segments[i].state, new_length)
             segments[i] = new_segment
@@ -297,7 +289,6 @@ def merge_rgt_ocean(segments):
     for i in range(1, len(segments)):
         if segments_clean[-1].state == State.RGT:
             if segments[i].state == State.RGT:
-                print("here")
                 coords = list(segments_clean[-1].line_string.coords)
                 coords.extend(segments[i].line_string.coords)
                 new_length = segments_clean[-1].length + segments[i].length

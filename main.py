@@ -47,6 +47,9 @@ def main():
     start_longitude = -0.131847178124
     for file in file_list:
         orbit_gcs = Kr.get_coordinates_from_kml(dir_name + '/' + file)
+        # if rgt == 8:
+        #     print(orbit_gcs)
+        #     return
         orbit_cart = Conversions.gcs_list_to_cartesian(orbit_gcs)
         orbit_line = shapely.make_valid(LineString(orbit_cart))
 
@@ -78,12 +81,10 @@ def main():
 
         else:
             segments_combined = []
+            print('Num of segments: ', len(segments))
             for i in range(len(segments)):
-                print('happen')
-
                 segments_clean = Pg.segmentation(mask_multipolygon, new_land_final_multi,
                                                  LineString(Conversions.gcs_list_to_cartesian(list(segments[i].coords))))
-                # segments_clean = Pg.segmentation(mask_multipolygon, new_land_final_multi, orbit_line)
                 segments_clean = Pg.remove_insignificant_segments(segments_clean)
                 segments_clean = Pg.merge_touching_segments(segments_clean)
                 segments_clean = Pg.sort_segments_by_coordinates(segments_clean,
@@ -98,6 +99,8 @@ def main():
                                                            list(segments_combined[-1].line_string.coords)[-1][1])
                 start_longitude = - coordinates[0]
                 start_latitude = coordinates[1]
+                print('num_split: ', len(segments_clean))
+                print([segment.state for segment in segments_clean])
                 print('lats: ', start_longitude, start_latitude)
 
             segments_combined = Pg.merge_corresponding_segments(segments_combined)
@@ -112,6 +115,11 @@ def main():
                 if len(segment.points) != 0:
                     for point in segment.points:
                         points_dict[rgt].append(point)
+                        # if rgt == 8:
+                        #     longitude, latitiude = Conversions.cartesian_to_gcs(point.longitude, point.latitude)
+                        #     if longitude == 8.983152841195214e-06:
+                        #         print(Conversions.cartesian_list_to_gcs(list(segment.line_string.coords)))
+                        #     print(Conversions.cartesian_to_gcs(point.longitude, point.latitude), point.endpoint)
 
         rgt += 1
         cart_coords = orbit_gcs[-1]
@@ -121,7 +129,7 @@ def main():
         start_latitude = gcs_coords[1]
         print(f'rgt {rgt}: last coords: {start_latitude} {start_longitude}')
 
-    Pg.remove_twilight_points(points_dict)
+    # Pg.remove_twilight_points(points_dict)
     Pg.remove_duplicate_points(points_dict)
     Pg.remove_extra_endpoints(points_dict)
 
@@ -131,7 +139,7 @@ def main():
     singular_point_errors = Pg.singular_point_errors(points_dict)
     print_transition_errors(transition_errors)
     print_transition_errors(singular_point_errors)
-    print(f'Num cross: {Pg.index}')
+    print(f'Num cross: {len(Pg.crossing_rgts)}')
     print(Pg.crossing_rgts)
 
 

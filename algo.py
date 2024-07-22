@@ -242,7 +242,7 @@ def validate_points(segments, rgt):
                 state = TypePoint.VEGETATION
                 if segments[i].state == State.RGT:
                     state = TypePoint.RGT
-                segments[i - 1].points.append(Pt.Point(rgt, state, 1, 1))  # NEED to generate asc_req
+                segments[i - 1].points.append(Pt.Point(rgt, state, 0, 0))  # NEED to generate asc_req
                 push_up(segments[i - 1])
 
         i += 1
@@ -251,7 +251,7 @@ def validate_points(segments, rgt):
         state = TypePoint.VEGETATION
         if segments[i].state == State.RGT:
             state = TypePoint.RGT
-        segments[i - 1].points.append(Pt.Point(rgt, state, 1, 1))  # NEED to generate asc_req
+        segments[i - 1].points.append(Pt.Point(rgt, state, 0, 0))  # NEED to generate asc_req
         push_up(segments[i - 1])
 
     add_endpoint(segments)
@@ -269,6 +269,8 @@ def push_up(segment):
         point_x, point_y = Conversions.cartesian_to_gcs(point.coords[0][0], point.coords[0][1])
         endpoint_x, endpoint_y = Conversions.cartesian_to_gcs(segment_endpoint.coords[0][0], segment_endpoint.coords[0][1])
         distance = Conversions.get_geodesic_length(LineString(((point_x, point_y), (endpoint_x, endpoint_y))))
+        if point_y == 0:
+            distance = float('inf')
 
     if distance > TOLERANCE:
         new_x = list(segment_endpoint.coords)[0][0]
