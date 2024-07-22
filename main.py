@@ -16,7 +16,7 @@ def main():
     mask_polygons_cart = [Polygon(Conversions.gcs_list_to_cartesian(coords)) for coords in mask_gcs_coords]
     mask_multipolygon = shapely.make_valid(MultiPolygon(mask_polygons_cart))
 
-    land_gcs_coords = Kr.parse_mask( '/Users/pvelmuru/Desktop/accurate_land_mask/better/accurate_land_mask_better.kml')
+    land_gcs_coords = Kr.parse_mask( '/Users/pvelmuru/Desktop/accurate_land_mask/better/Accurate/land_mask.kml')
     land_polygon_cart = [Polygon(Conversions.gcs_list_to_cartesian(coordinates)) for coordinates in land_gcs_coords]
     land_multipolygon = shapely.make_valid(MultiPolygon(land_polygon_cart))
 
@@ -129,7 +129,7 @@ def main():
         start_latitude = gcs_coords[1]
         print(f'rgt {rgt}: last coords: {start_latitude} {start_longitude}')
 
-    # Pg.remove_twilight_points(points_dict)
+    Pg.remove_twilight_points(points_dict)
     Pg.remove_duplicate_points(points_dict)
     Pg.remove_extra_endpoints(points_dict)
 

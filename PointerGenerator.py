@@ -314,11 +314,11 @@ def remove_twilight_points(points_dict):
             point = points_dict[rgt][i]
             longitude, latitude = Conversions.cartesian_to_gcs(point.longitude, point.latitude)
             if longitude > 179.888:
-                if -88 <= latitude <= 88:  # turn into constants
+                if -88 <= latitude <= 88 and point.asc_req == -1:  # turn into constants
                     points_dict[rgt].pop(i)
                     i -= 1
             elif longitude < -179.888:
-                if -88 <= latitude <= 88:
+                if -88 <= latitude <= 88 and point.asc_req == -1:
                     points_dict[rgt].pop(i)
                     i -= 1
 
