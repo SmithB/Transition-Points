@@ -9,6 +9,7 @@ from Segment import State
 import CsvHandler as Ch
 import algo
 import os
+import tkinter as tk
 
 
 def main():
@@ -81,7 +82,6 @@ def main():
 
         else:
             segments_combined = []
-            print('Num of segments: ', len(segments))
             for i in range(len(segments)):
                 segments_clean = Pg.segmentation(mask_multipolygon, new_land_final_multi,
                                                  LineString(Conversions.gcs_list_to_cartesian(list(segments[i].coords))))
@@ -99,11 +99,10 @@ def main():
                                                            list(segments_combined[-1].line_string.coords)[-1][1])
                 start_longitude = - coordinates[0]
                 start_latitude = coordinates[1]
-                print('num_split: ', len(segments_clean))
-                print([segment.state for segment in segments_clean])
-                print('lats: ', start_longitude, start_latitude)
 
             segments_combined = Pg.merge_corresponding_segments(segments_combined)
+            print('Num Segments: ', len(segments_combined))
+            print([segment.state for segment in segments_combined])
             segments_combined = Pg.assign_points(rgt, points_dict, segments_combined)
 
             segments_combined = algo.validate_points(segments_combined, rgt)
@@ -111,23 +110,16 @@ def main():
             points_dict[rgt] = []
             print(f'rgt: {rgt}: ')
             for segment in segments_combined:
-                print(segment.state, segment.length)
+                # print(segment.state, segment.length)
                 if len(segment.points) != 0:
                     for point in segment.points:
                         points_dict[rgt].append(point)
-                        # if rgt == 8:
-                        #     longitude, latitiude = Conversions.cartesian_to_gcs(point.longitude, point.latitude)
-                        #     if longitude == 8.983152841195214e-06:
-                        #         print(Conversions.cartesian_list_to_gcs(list(segment.line_string.coords)))
-                        #     print(Conversions.cartesian_to_gcs(point.longitude, point.latitude), point.endpoint)
 
         rgt += 1
         cart_coords = orbit_gcs[-1]
-        print(cart_coords)
         gcs_coords = cart_coords[0], cart_coords[1]
         start_longitude = gcs_coords[0]
         start_latitude = gcs_coords[1]
-        print(f'rgt {rgt}: last coords: {start_latitude} {start_longitude}')
 
     Pg.remove_twilight_points(points_dict)
     Pg.remove_duplicate_points(points_dict)

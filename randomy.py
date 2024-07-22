@@ -1,6 +1,9 @@
 import random
 from shapely import LineString
+import tkinter as tk
+from tkinter import filedialog
 
+filedialog.askopenfilename(title='ll')
 
 rgts = []
 

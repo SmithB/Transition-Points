@@ -20,4 +20,6 @@ def shp_to_kml(shapefile):
     :return:
     """
     read_shp = gpd.read_file(shapefile)
-    read_shp.to_file('./Data' + '/' + shapefile[:-4] + '.kml', driver='KML')
+    new_filepath = './Data' + '/' + shapefile[:-4] + '.kml'
+    read_shp.to_file(new_filepath, driver='KML')
+    return new_filepath

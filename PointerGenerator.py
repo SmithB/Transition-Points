@@ -5,8 +5,6 @@ import shapely
 import Conversions
 import Point as Pt
 
-import KmlTester
-
 rgt_num = 0
 crossing_rgts = []
 
@@ -59,7 +57,7 @@ def segmentation(rgt_mask, land_mask, rgt):  # Uses modified land Mask
 
     def add_segment(intersections, state):
         if type(intersections) is LineString:
-            print("LINE String occurs")
+            # print("LINE String occurs")
             line = LineString(Conversions.cartesian_list_to_gcs(list(intersections.coords)))
             length = Conversions.get_geodesic_length(line)
             # if length == 0.0:
@@ -99,7 +97,7 @@ def segmentation(rgt_mask, land_mask, rgt):  # Uses modified land Mask
 
     ocean_intersections = rgt.difference(rgt_intersections)
     ocean_intersections = ocean_intersections.difference(land_intersections)
-    print(type(ocean_intersections))
+    # print(type(ocean_intersections))
     if not isinstance(ocean_intersections,LineString):
         ocean_intersections = MultiLineString([line_string for line_string in ocean_intersections.geoms
                                            if not line_string.is_closed and line_string.dwithin(rgt, 1e-8)])
@@ -145,7 +143,7 @@ def merge_corresponding_segments(segments):
             segment1 = segments[i].line_string
             segment2 = segments[i + 1].line_string
             merge_coords = list(segment1.coords)[:-1] + list(segment2.coords)
-            print('lengths: ', segments[i].length, segments[i + 1].length)
+            # print('lengths: ', segments[i].length, segments[i + 1].length)
             new_length = segments[i].length + segments[i + 1].length
             new_segment = Segment(LineString(merge_coords), segments[i].state, new_length)
             segments[i] = new_segment
