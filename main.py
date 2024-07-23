@@ -9,7 +9,6 @@ from Segment import State
 import CsvHandler as Ch
 import algo
 import os
-import tkinter as tk
 
 
 def main():

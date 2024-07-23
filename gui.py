@@ -9,33 +9,39 @@ transition_csv_path = None
 rgt_folder_path = None
 threshold_kilometers = None
 
+
 def set_mask_filetype(filetype):
     global mask_filetype
     mask_filetype = filetype
-    proceed_to_next(question_label, buttons)
+    proceed_to_next(question_label, *buttons)
+
 
 def set_mask_region_type(region_type):
     global mask_region_type
     mask_region_type = region_type
-    proceed_to_next(question_label, buttons)
+    proceed_to_next(question_label, *buttons)
+
 
 def select_mask_filepath():
     global mask_filepath
     mask_filepath = filedialog.askopenfilename(title="Select Mask File")
     if mask_filepath:
-        proceed_to_next(button)
+        proceed_to_next(question_label, button)
+
 
 def select_transition_csv():
     global transition_csv_path
     transition_csv_path = filedialog.askopenfilename(title="Select Transition Point CSV File")
     if transition_csv_path:
-        proceed_to_next(button)
+        proceed_to_next(question_label, button)
+
 
 def select_rgt_folder():
     global rgt_folder_path
     rgt_folder_path = filedialog.askdirectory(title="Select Folder with RGTs")
     if rgt_folder_path:
-        proceed_to_next(button)
+        proceed_to_next(question_label, button)
+
 
 def enter_threshold_kilometers():
     global threshold_kilometers
@@ -43,10 +49,12 @@ def enter_threshold_kilometers():
     if threshold_kilometers is not None:
         proceed_to_next(button)
 
+
 def proceed_to_next(*widgets):
     for widget in widgets:
         widget.pack_forget()
     step()
+
 
 steps = [
     lambda: setup_question("Is the mask a kml or shapefile?", ["KML", "Shapefile"], set_mask_filetype),
@@ -57,6 +65,7 @@ steps = [
     lambda: setup_threshold_kilometers()
 ]
 
+
 def setup_question(question, options, command):
     global question_label, buttons
     question_label = tk.Label(root, text=question)
@@ -65,12 +74,14 @@ def setup_question(question, options, command):
     for button in buttons:
         button.pack(pady=5)
 
+
 def setup_file_selection(question, command):
     global question_label, button
     question_label = tk.Label(root, text=question)
     question_label.pack(pady=10)
     button = tk.Button(root, text="Select File", command=command)
     button.pack(pady=5)
+
 
 def setup_folder_selection(question, command):
     global question_label, button
@@ -79,14 +90,24 @@ def setup_folder_selection(question, command):
     button = tk.Button(root, text="Select Folder", command=command)
     button.pack(pady=5)
 
+
 def setup_threshold_kilometers():
     enter_threshold_kilometers()
+
 
 def step():
     if steps:
         steps.pop(0)()
+    else:
+        root.quit()
+
 
 def main():
+    other()
+    print(mask_filetype, mask_region_type, mask_filepath, transition_csv_path, rgt_folder_path, threshold_kilometers)
+
+
+def other():
     global root
     root = tk.Tk()
     root.title("Transition Point Modifier")
@@ -95,6 +116,7 @@ def main():
     step()
 
     root.mainloop()
+
 
 if __name__ == "__main__":
     main()
