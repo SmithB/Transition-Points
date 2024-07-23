@@ -15,13 +15,11 @@ import ShpConverter as Sc
 
 mask_filetype = None  # True represents KML file, False Represents Shp
 
-global root
-
 
 def get_folder():
     folder_path = filedialog.askdirectory(title="Select the directory with all 1387 RGTs")
 
-def generate_points(mask_file):
+def generate_points(mask_file, root):
     mask_gcs_coords = Kr.parse_mask(mask_file)
     mask_polygons_cart = [Polygon(Conversions.gcs_list_to_cartesian(coords)) for coords in mask_gcs_coords]
     mask_multipolygon = shapely.make_valid(MultiPolygon(mask_polygons_cart))
@@ -84,8 +82,7 @@ def generate_points(mask_file):
                               points_dict)
 
 
-def set_mask_filetype(filetype):
-    global root
+def set_mask_filetype(filetype, root):
     global mask_filetype
     mask_filetype = filetype
     for widget in root.winfo_children():
@@ -97,15 +94,14 @@ def set_mask_filetype(filetype):
         selection_label = tk.Label(root,
                                    text='Select a file')
         if mask_filetype:
-            generate_points(file_path)
+            generate_points(file_path, root)
         else:
-            generate_points(Sc.shp_to_kml(file_path))
+            generate_points(Sc.shp_to_kml(file_path), root)
     else:
         messagebox.showinfo("No File Selected", "No file was selected")
         root.destroy()
 
 def main():
-    global root
     root = tk.Tk()
     root.title("Transition Point Generator")
     root.geometry("550x300")
@@ -114,8 +110,8 @@ def main():
                               text='Is the mask a kml or shapefile?')
     question_label.pack(pady=10)
 
-    kml_button = tk.Button(root, text='KML', width=25, command=lambda: set_mask_filetype(True))
-    shp_button = tk.Button(root, text='Shapefile', width=25, command=lambda: set_mask_filetype(False))
+    kml_button = tk.Button(root, text='KML', width=25, command=lambda: set_mask_filetype(True, root))
+    shp_button = tk.Button(root, text='Shapefile', width=25, command=lambda: set_mask_filetype(False, root))
     kml_button.pack(side=tk.LEFT, padx=10, pady=10)
     shp_button.pack(side=tk.RIGHT, padx=10, pady=10)
 
