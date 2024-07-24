@@ -41,7 +41,7 @@ def split_ani_meridian(rgt):
     return segments
 
 
-def segmentation(rgt_mask, land_mask, rgt):  # Uses modified land Mask
+def segmentation(land_mask, rgt):  # Uses modified land Mask
     """
     Segments the given RGT into sections of veg pointing, rgt pointing,
     and ocean/polar region rgt pointing
@@ -85,18 +85,18 @@ def segmentation(rgt_mask, land_mask, rgt):  # Uses modified land Mask
                     # print('lllllen: ', length)
                     segment = Segment(intersection, state, length)
                     segments.append(segment)
-
-    rgt_intersections = Intersections.find_intersections(rgt, rgt_mask)
-    add_segment(rgt_intersections, State.RGT)
-    rgt_intersections = MultiLineString([segment.line_string for segment in segments if segment.state == State.RGT])
+    #
+    # rgt_intersections = Intersections.find_intersections(rgt, rgt_mask)
+    # add_segment(rgt_intersections, State.RGT)
+    # rgt_intersections = MultiLineString([segment.line_string for segment in segments if segment.state == State.RGT])
 
     land_intersections = Intersections.find_intersections(rgt, land_mask)
     add_segment(land_intersections, State.VEGETATION)
     land_intersections = MultiLineString([segment.line_string for segment in segments if
                                           segment.state == State.VEGETATION])
 
-    ocean_intersections = rgt.difference(rgt_intersections)
-    ocean_intersections = ocean_intersections.difference(land_intersections)
+    # ocean_intersections = rgt.difference(rgt_intersections)
+    ocean_intersections = rgt.difference(land_intersections)
     # print(type(ocean_intersections))
     if not isinstance(ocean_intersections,LineString):
         ocean_intersections = MultiLineString([line_string for line_string in ocean_intersections.geoms
@@ -112,7 +112,7 @@ def merge_touching_segments(segments):
     :param segments: list of Segments
     :return: cleaned list of Segments
     """
-    mask_segments = [segment for segment in segments if segment.state == State.RGT]
+    # mask_segments = [segment for segment in segments if segment.state == State.RGT]
     land_segments = [segment for segment in segments if segment.state == State.VEGETATION]
     ocean_segments = [segment for segment in segments if segment.state == State.OCEAN]
 
@@ -130,10 +130,10 @@ def merge_touching_segments(segments):
             i += 1
         return segments
 
-    mask_segments = merge(mask_segments)
+    # mask_segments = merge(mask_segments)
     land_segments = merge(land_segments)
     ocean_segments = merge(ocean_segments)
-    return mask_segments + land_segments + ocean_segments
+    return land_segments + ocean_segments
 
 
 def merge_corresponding_segments(segments):
@@ -350,10 +350,10 @@ def remove_duplicate_points(points_dict):
 
             i += 1
 
-
+# TODO maybe add these changes to the Pg too
 def remove_extra_endpoints(points_dict):
     for i in range(1, 1387):
-        if points_dict[i][-1].asc_req == -1 and not points_dict[i + 1][0].endpoint:
+        if points_dict[i][-1].asc_req == -1 and not points_dict[i + 1][0].endpoint and points_dict[i][-1].state == points_dict[i + 1][0].state:
             points_dict[i].pop(-1)
 
         elif (points_dict[i + 1][0].asc_req == -1 and

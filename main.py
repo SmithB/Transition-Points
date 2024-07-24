@@ -4,23 +4,43 @@ import KmlTester
 import Conversions
 from shapely import LineString, MultiPolygon, Polygon, MultiLineString
 import shapely
-import PointerGenerator as Pg
+import ShpConverter
 from Segment import State
 import CsvHandler as Ch
-import algo
 import os
-
+import traceback
 
 def main():
-    mask_gcs_coords = Kr.parse_mask('/Users/pvelmuru/Desktop/snow_depth_mask.kml')
+
+    off_pointing = True
+
+    if off_pointing:
+        import PointerGenerator as Pg
+        import algo as algo
+    else:
+        import CombinePointGenerator as Pg
+        import combineAlgo as algo
+
+    kml = True
+
+    if kml:
+        mask_gcs_coords = Kr.parse_mask('/Users/pvelmuru/Desktop/snow_depth_mask.kml')
+    else:
+        try:
+            mask_gcs_coords = Kr.parse_mask(ShpConverter.shp_to_kml('/Users/pvelmuru/Downloads/AntarcticaGreenland'))
+        except:
+            traceback.print_exc()
+
+
     mask_polygons_cart = [Polygon(Conversions.gcs_list_to_cartesian(coords)) for coords in mask_gcs_coords]
-    mask_multipolygon = shapely.make_valid(MultiPolygon(mask_polygons_cart))
+    mask_multipolygon = shapely.make_valid(MultiPolygon(mask_polygons_cart)) # TODO issue
 
     land_gcs_coords = Kr.parse_mask( '/Users/pvelmuru/Desktop/accurate_land_mask/better/Accurate/land_mask.kml')
     land_polygon_cart = [Polygon(Conversions.gcs_list_to_cartesian(coordinates)) for coordinates in land_gcs_coords]
     land_multipolygon = shapely.make_valid(MultiPolygon(land_polygon_cart))
 
-    new_land_multipolygon = Intersections.modify_land_mask(land_multipolygon, mask_multipolygon)  # RETURNS back GCS
+    # new_land_multipolygon = Intersections.modify_land_mask(land_multipolygon, mask_multipolygon)  # RETURNS back GCS
+    new_land_multipolygon = Intersections.combine_land_mask(land_multipolygon, mask_multipolygon)
     new_land_cart = [Polygon(Conversions.gcs_list_to_cartesian(polygon.exterior.coords))
                      for polygon in new_land_multipolygon.geoms]
     new_land_final_multi = shapely.make_valid(MultiPolygon(new_land_cart))
@@ -55,10 +75,10 @@ def main():
 
         segments = Pg.split_ani_meridian(LineString(Conversions.cartesian_list_to_gcs(list(orbit_line.coords))))
 
-        print(f'{rgt} len ', len(segments))
+        print(f'rgt {rgt} len ', len(segments))
 
         if len(segments) == 1:
-            segments_clean = Pg.segmentation(mask_multipolygon, new_land_final_multi, orbit_line)
+            segments_clean = Pg.segmentation(mask_multipolygon, new_land_final_multi, orbit_line) #TODO yup
             segments_clean = Pg.remove_insignificant_segments(segments_clean)
             segments_clean = Pg.merge_touching_segments(segments_clean)
             segments_clean = Pg.sort_segments_by_coordinates(segments_clean,
@@ -82,7 +102,7 @@ def main():
         else:
             segments_combined = []
             for i in range(len(segments)):
-                segments_clean = Pg.segmentation(mask_multipolygon, new_land_final_multi,
+                segments_clean = Pg.segmentation(new_land_final_multi,
                                                  LineString(Conversions.gcs_list_to_cartesian(list(segments[i].coords))))
                 segments_clean = Pg.remove_insignificant_segments(segments_clean)
                 segments_clean = Pg.merge_touching_segments(segments_clean)
@@ -101,11 +121,13 @@ def main():
 
             segments_combined = Pg.merge_corresponding_segments(segments_combined)
             print('Num Segments: ', len(segments_combined))
-            print([segment.state for segment in segments_combined])
+            print([(segment.state, segment.length) for segment in segments_combined])
             segments_combined = Pg.assign_points(rgt, points_dict, segments_combined)
+            # print([segment.points for segment in segments_combined])
 
             segments_combined = algo.validate_points(segments_combined, rgt)
 
+            print([(i, point.state) for i, segment in enumerate(segments_combined) for point in segment.points])
             points_dict[rgt] = []
             print(f'rgt: {rgt}: ')
             for segment in segments_combined:
@@ -113,6 +135,11 @@ def main():
                 if len(segment.points) != 0:
                     for point in segment.points:
                         points_dict[rgt].append(point)
+
+            # if rgt == 1372:
+            #     print(list(orbit_gcs))
+            #     KmlTester.create_file_multiline(MultiLineString([Conversions.cartesian_list_to_gcs(list(segment.line_string.coords))  for segment in segments_combined]))
+            #     return
 
         rgt += 1
         cart_coords = orbit_gcs[-1]

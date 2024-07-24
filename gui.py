@@ -59,9 +59,9 @@ def proceed_to_next(*widgets):
 steps = [
     lambda: setup_question("Is the mask a kml or shapefile?", ["KML", "Shapefile"], set_mask_filetype),
     lambda: setup_question("Is the mask region an off-pointing or RGT?", ["Off-Pointing", "RGT"], set_mask_region_type),
-    lambda: setup_file_selection("Enter mask filepath:", select_mask_filepath),
-    lambda: setup_file_selection("Enter initial Transition Point csv file:", select_transition_csv),
-    lambda: setup_folder_selection("Enter folder with RGTs:", select_rgt_folder),
+    lambda: setup_file_selection("Select mask file:", select_mask_filepath),
+    lambda: setup_file_selection("Select Transition Point csv file:", select_transition_csv),
+    lambda: setup_folder_selection("Select folder with 1387 RGTs:", select_rgt_folder),
     lambda: setup_threshold_kilometers()
 ]
 
@@ -102,12 +102,7 @@ def step():
         root.quit()
 
 
-def main():
-    other()
-    print(mask_filetype, mask_region_type, mask_filepath, transition_csv_path, rgt_folder_path, threshold_kilometers)
-
-
-def other():
+def run():
     global root
     root = tk.Tk()
     root.title("Transition Point Modifier")
@@ -118,5 +113,5 @@ def other():
     root.mainloop()
 
 
-if __name__ == "__main__":
-    main()
+if __name__ == '__main__':
+    run()
