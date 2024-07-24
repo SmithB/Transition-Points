@@ -12,7 +12,7 @@ import traceback
 
 def main():
 
-    off_pointing = True
+    off_pointing = False
 
     if off_pointing:
         import PointerGenerator as Pg
@@ -21,7 +21,7 @@ def main():
         import CombinePointGenerator as Pg
         import combineAlgo as algo
 
-    kml = True
+    kml = False
 
     if kml:
         mask_gcs_coords = Kr.parse_mask('/Users/pvelmuru/Desktop/snow_depth_mask.kml')
@@ -39,8 +39,11 @@ def main():
     land_polygon_cart = [Polygon(Conversions.gcs_list_to_cartesian(coordinates)) for coordinates in land_gcs_coords]
     land_multipolygon = shapely.make_valid(MultiPolygon(land_polygon_cart))
 
-    # new_land_multipolygon = Intersections.modify_land_mask(land_multipolygon, mask_multipolygon)  # RETURNS back GCS
-    new_land_multipolygon = Intersections.combine_land_mask(land_multipolygon, mask_multipolygon)
+    if off_pointing:
+        new_land_multipolygon = Intersections.modify_land_mask(land_multipolygon, mask_multipolygon)  # RETURNS back GCS
+    else:
+        new_land_multipolygon = Intersections.combine_land_mask(land_multipolygon, mask_multipolygon)
+
     new_land_cart = [Polygon(Conversions.gcs_list_to_cartesian(polygon.exterior.coords))
                      for polygon in new_land_multipolygon.geoms]
     new_land_final_multi = shapely.make_valid(MultiPolygon(new_land_cart))
@@ -62,7 +65,7 @@ def main():
     points_dict = Ch.read_csv('/Users/pvelmuru/PycharmProjects/Transistion Points/RGT_transition_locations_V2.0 1.csv',
                               points_dict)
 
-    rgt = 1  # Do not forget the sort -- will sort backwards otherwise
+    rgt = 1
     start_latitude = 0.0279589282518
     start_longitude = -0.131847178124
     for file in file_list:
@@ -78,7 +81,10 @@ def main():
         print(f'rgt {rgt} len ', len(segments))
 
         if len(segments) == 1:
-            segments_clean = Pg.segmentation(mask_multipolygon, new_land_final_multi, orbit_line) #TODO yup
+            if off_pointing:
+                segments_clean = Pg.segmentation(mask_multipolygon, new_land_final_multi, orbit_line)
+            else:
+                segments_clean = Pg.segmentation(new_land_final_multi, orbit_line)
             segments_clean = Pg.remove_insignificant_segments(segments_clean)
             segments_clean = Pg.merge_touching_segments(segments_clean)
             segments_clean = Pg.sort_segments_by_coordinates(segments_clean,
@@ -102,8 +108,14 @@ def main():
         else:
             segments_combined = []
             for i in range(len(segments)):
-                segments_clean = Pg.segmentation(new_land_final_multi,
-                                                 LineString(Conversions.gcs_list_to_cartesian(list(segments[i].coords))))
+                if off_pointing:
+                    segments_clean = Pg.segmentation(mask_multipolygon, new_land_final_multi,
+                                                     LineString(
+                                                         Conversions.gcs_list_to_cartesian(list(segments[i].coords))))
+                else:
+                    segments_clean = Pg.segmentation(new_land_final_multi,
+                                                     LineString(Conversions.gcs_list_to_cartesian(list(segments[i].coords))))
+
                 segments_clean = Pg.remove_insignificant_segments(segments_clean)
                 segments_clean = Pg.merge_touching_segments(segments_clean)
                 segments_clean = Pg.sort_segments_by_coordinates(segments_clean,
