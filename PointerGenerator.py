@@ -353,7 +353,7 @@ def remove_duplicate_points(points_dict):
 
 def remove_extra_endpoints(points_dict):
     for i in range(1, 1387):
-        if points_dict[i][-1].asc_req == -1 and not points_dict[i + 1][0].endpoint:
+        if points_dict[i][-1].asc_req == -1 and not points_dict[i + 1][0].endpoint and points_dict[i][-1].state == points_dict[i + 1][0].state:
             points_dict[i].pop(-1)
 
         elif (points_dict[i + 1][0].asc_req == -1 and

@@ -7,6 +7,7 @@ import shapely
 import ShpConverter
 from Segment import State
 import CsvHandler as Ch
+import AscReq
 import os
 import traceback
 
@@ -148,10 +149,7 @@ def main():
                     for point in segment.points:
                         points_dict[rgt].append(point)
 
-            # if rgt == 1372:
-            #     print(list(orbit_gcs))
-            #     KmlTester.create_file_multiline(MultiLineString([Conversions.cartesian_list_to_gcs(list(segment.line_string.coords))  for segment in segments_combined]))
-            #     return
+            AscReq.generate_asc_req(orbit_gcs, points_dict[rgt])
 
         rgt += 1
         cart_coords = orbit_gcs[-1]
