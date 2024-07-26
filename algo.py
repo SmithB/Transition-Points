@@ -26,10 +26,10 @@ def validate_points(segments, rgt):
                         segments[i].points.pop(0)
                         break
                     else:
-                        print('add point')
-                        print(segments[i].state.value, segments[i].points[0].state.value)
-                        # Not too sure tbh
-                        segments[i].points = []
+                        # print('add point')
+                        # print(segments[i].state.value, segments[i].points[0].state.value)
+                        # # Not too sure tbh
+                        # segments[i].points = []
                         print('ERROR 8')
                         break
                 else:

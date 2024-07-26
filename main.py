@@ -4,6 +4,7 @@ import KmlTester
 import Conversions
 from shapely import LineString, MultiPolygon, Polygon, MultiLineString
 import shapely
+import algo
 import ShpConverter
 from Segment import State
 import CsvHandler as Ch
@@ -12,15 +13,12 @@ import os
 import traceback
 
 def main():
-
     off_pointing = False
 
     if off_pointing:
-        # import PointerGenerator as Pg
-        import algo as algo
+        import PointerGenerator as Pg
     else:
         import CombinePointGenerator as Pg
-        import algo as algo
 
     kml = False
 
@@ -34,7 +32,7 @@ def main():
 
 
     mask_polygons_cart = [Polygon(Conversions.gcs_list_to_cartesian(coords)) for coords in mask_gcs_coords]
-    mask_multipolygon = shapely.make_valid(MultiPolygon(mask_polygons_cart)) # TODO issue
+    mask_multipolygon = shapely.make_valid(MultiPolygon(mask_polygons_cart))
 
     land_gcs_coords = Kr.parse_mask( '/Users/pvelmuru/Desktop/accurate_land_mask/better/Accurate/land_mask.kml')
     land_polygon_cart = [Polygon(Conversions.gcs_list_to_cartesian(coordinates)) for coordinates in land_gcs_coords]
@@ -71,9 +69,6 @@ def main():
     start_longitude = -0.131847178124
     for file in file_list:
         orbit_gcs = Kr.get_coordinates_from_kml(dir_name + '/' + file)
-        # if rgt == 8:
-        #     print(orbit_gcs)
-        #     return
         orbit_cart = Conversions.gcs_list_to_cartesian(orbit_gcs)
         orbit_line = shapely.make_valid(LineString(orbit_cart))
 
