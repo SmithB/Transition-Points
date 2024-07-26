@@ -28,7 +28,7 @@ def generate_asc_req(coords, points):
     segment3 = LineString(Conversions.gcs_list_to_cartesian(coords[index:]))
 
     for point in points:
-        if point.asc_req == -1:
+        if point.created:
             point_cpy = Point(point.longitude, point.latitude)
             dist1 = point_cpy.distance(segment1) / 1000
             dist2 = point_cpy.distance(segment2) / 1000

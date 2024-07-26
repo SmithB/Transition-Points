@@ -312,11 +312,11 @@ def remove_twilight_points(points_dict):
             point = points_dict[rgt][i]
             longitude, latitude = Conversions.cartesian_to_gcs(point.longitude, point.latitude)
             if longitude > 179.888:
-                if -33.5 <= latitude <= 4 and point.asc_req == -1:  # turn into constants
+                if -33.5 <= latitude <= 4 and point.created:  # turn into constants
                     points_dict[rgt].pop(i)
                     i -= 1
             elif longitude < -179.888:
-                if -33.5 <= latitude <= 4 and point.asc_req == -1:   # TODO setting bounds to [-88, 88] removes extraneous points, but it is a bandage fix
+                if -33.5 <= latitude <= 4 and point.created:   # TODO setting bounds to [-88, 88] removes extraneous points, but it is a bandage fix
                     points_dict[rgt].pop(i)
                     i -= 1
 
@@ -353,11 +353,15 @@ def remove_duplicate_points(points_dict):
 # TODO maybe add these changes to the Pg too
 def remove_extra_endpoints(points_dict):
     for i in range(1, 1387):
-        if points_dict[i][-1].asc_req == -1 and not points_dict[i + 1][0].endpoint and points_dict[i][-1].state == points_dict[i + 1][0].state:
+        if points_dict[i][-1].created and not points_dict[i + 1][0].endpoint and points_dict[i][-1].state == points_dict[i + 1][0].state:
+            # print(points_dict[i][-1].created, 'lol')
+            # breakpoint()
             points_dict[i].pop(-1)
 
-        elif (points_dict[i + 1][0].asc_req == -1 and
+        elif (points_dict[i + 1][0].created and
               (points_dict[i][-1].state == points_dict[i + 1][0].state)):
+            # print(points_dict[i][-1].created, 'yup')
+            # breakpoint()
             points_dict[i + 1].pop(0)
 
 

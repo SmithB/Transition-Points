@@ -244,7 +244,7 @@ def validate_points(segments, rgt):
                 state = TypePoint.VEGETATION
                 if segments[i].state == State.RGT:
                     state = TypePoint.RGT
-                segments[i - 1].points.append(Pt.Point(rgt, state, 0, 0))
+                segments[i - 1].points.append(Pt.Point(rgt, state, 0, 0, created=True))
                 push_up(segments[i - 1])
 
         i += 1
@@ -253,7 +253,7 @@ def validate_points(segments, rgt):
         state = TypePoint.VEGETATION
         if segments[i].state == State.RGT:
             state = TypePoint.RGT
-        segments[i - 1].points.append(Pt.Point(rgt, state, 0, 0))
+        segments[i - 1].points.append(Pt.Point(rgt, state, 0, 0, created=True))
         push_up(segments[i - 1])
 
     add_endpoint(segments)
@@ -279,7 +279,7 @@ def push_up(segment):
         new_y = list(segment_endpoint.coords)[0][1]
 
         segment.points[-1] = Pt.Point(segment.points[-1].rgt, segment.points[-1].state, new_y, new_x,
-                                      segment.points[-1].asc_req)
+                                      segment.points[-1].asc_req, created=segment.points[-1].created)
 
 
 def add_endpoint(segments):
@@ -289,7 +289,7 @@ def add_endpoint(segments):
             point = segments[i].points[0]
             if not point.endpoint:
                 state = TypePoint.RGT if point.state == TypePoint.VEGETATION else TypePoint.VEGETATION
-                segments[i].points.append(Pt.Point(point.rgt, state, 1, 1))
+                segments[i].points.append(Pt.Point(point.rgt, state, 1, 1, created=True))
                 push_up(segments[i])
 
         i += 1
