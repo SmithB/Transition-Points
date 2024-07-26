@@ -26,6 +26,8 @@ def validate_points(segments, rgt):
                         segments[i].points.pop(0)
                         break
                     else:
+                        print('add point')
+                        print(segments[i].state.value, segments[i].points[0].state.value)
                         # Not too sure tbh
                         segments[i].points = []
                         print('ERROR 8')
@@ -242,7 +244,7 @@ def validate_points(segments, rgt):
                 state = TypePoint.VEGETATION
                 if segments[i].state == State.RGT:
                     state = TypePoint.RGT
-                segments[i - 1].points.append(Pt.Point(rgt, state, 0, 0))  # NEED to generate asc_req
+                segments[i - 1].points.append(Pt.Point(rgt, state, 0, 0))
                 push_up(segments[i - 1])
 
         i += 1
@@ -251,7 +253,7 @@ def validate_points(segments, rgt):
         state = TypePoint.VEGETATION
         if segments[i].state == State.RGT:
             state = TypePoint.RGT
-        segments[i - 1].points.append(Pt.Point(rgt, state, 0, 0))  # NEED to generate asc_req
+        segments[i - 1].points.append(Pt.Point(rgt, state, 0, 0))
         push_up(segments[i - 1])
 
     add_endpoint(segments)
@@ -287,7 +289,7 @@ def add_endpoint(segments):
             point = segments[i].points[0]
             if not point.endpoint:
                 state = TypePoint.RGT if point.state == TypePoint.VEGETATION else TypePoint.VEGETATION
-                segments[i].points.append(Pt.Point(point.rgt, state, 1, 1))  # Need to generate asc_req
+                segments[i].points.append(Pt.Point(point.rgt, state, 1, 1))
                 push_up(segments[i])
 
         i += 1

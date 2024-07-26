@@ -149,7 +149,7 @@ def main():
                     for point in segment.points:
                         points_dict[rgt].append(point)
 
-            AscReq.generate_asc_req(orbit_gcs, points_dict[rgt])
+            # AscReq.generate_asc_req(orbit_gcs, points_dict[rgt])
 
         rgt += 1
         cart_coords = orbit_gcs[-1]
