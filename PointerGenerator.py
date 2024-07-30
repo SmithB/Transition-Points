@@ -5,19 +5,19 @@ import shapely
 import Conversions
 import Point as Pt
 
-rgt_num = 0
-crossing_rgts = []
+MIN_TRANSITION_DIST = 550  # Kilometers
+WARNING_THRESH = 500  # Kilometers
 
-MIN_TRANSITION_DIST = 1100  # Kilometers
-
+significant_rgts_under_thresh = []
+curr_rgt = 0
 
 def split_ani_meridian(rgt):
-    # test
+
+    global curr_rgt
+    curr_rgt += 1
+
     coords = list(rgt.coords)
     segments = []
-
-    global rgt_num
-    rgt_num += 1
 
     i = 1
     while i < len(coords):
@@ -26,7 +26,6 @@ def split_ani_meridian(rgt):
 
         if ((prev_point[0] < -170 and current_point[0] > 170) or
                 (prev_point[0] > 170 and current_point[0] < -170)):
-            crossing_rgts.append(rgt_num)
             first_half = coords[:i]
             coords = coords[i:]
             segments.append(LineString(first_half)) if len(first_half) > 1 else None
@@ -53,6 +52,7 @@ def segmentation(rgt_mask, land_mask, rgt):  # Uses modified land Mask
     :param rgt: LineString representing the RGT line
     :return: List of Segment objects that represents the rgt broken up
     """
+
     segments = []
 
     def add_segment(intersections, state):
@@ -193,7 +193,7 @@ def sort_segments_by_coordinates(segments, starting_coordinate):
                 index = i
         if next_segment:
             current_coordinate = next_segment.line_string.coords[-1]
-            print(f' {i} coordinate', Conversions.cartesian_to_gcs(current_coordinate[0], current_coordinate[1]))
+            # print(f' {i} coordinate', Conversions.cartesian_to_gcs(current_coordinate[0], current_coordinate[1]))
             sorted_segments.append(next_segment)
             segments.pop(index)
         else:
@@ -220,7 +220,11 @@ def remove_segments_under_thresh(segments):
         if dist >= MIN_TRANSITION_DIST or index == 0 or index == last_seg_index:
             clean_segments.append(segment)
         elif clean_segments:
-            print('Removing Segment')  # Warning
+            # print('Removing Segment')  # Warning
+            if dist > WARNING_THRESH:
+                global curr_rgt
+                significant_rgts_under_thresh.append(curr_rgt)
+
             coords = list(clean_segments[-1].line_string.coords)
             coords.extend(list(segment.line_string.coords))
             line = LineString(coords)
@@ -385,12 +389,12 @@ def generate_transition_errors(points_dict):
     return transition_errors
 
 
-def singular_point_errors(points_dict):
-    transition_errors = []
-
-    for rgt in range(1, 1388):
-        num_points = len(points_dict[rgt])
-        if num_points <= 1:
-            transition_errors.append(rgt)
-
-    return transition_errors
+# def singular_point_errors(points_dict):
+#     transition_errors = []
+#
+#     for rgt in range(1, 1388):
+#         num_points = len(points_dict[rgt])
+#         if num_points <= 1:
+#             transition_errors.append(rgt)
+#
+#     return transition_errors

@@ -11,6 +11,8 @@ import CsvHandler as Ch
 import AscReq
 import os
 import traceback
+import Warnings
+
 
 def main():
     off_pointing = False
@@ -159,41 +161,42 @@ def main():
     Ch.write_csv('/Users/pvelmuru/Desktop/testwrite.csv', points_dict)
 
     transition_errors = Pg.generate_transition_errors(points_dict)
-    singular_point_errors = Pg.singular_point_errors(points_dict)
-    print_transition_errors(transition_errors)
-    print_transition_errors(singular_point_errors)
-    print(f'Num cross: {len(Pg.crossing_rgts)}')
-    print(Pg.crossing_rgts)
+    # singular_point_errors = Pg.singular_point_errors(points_dict)
+    Warnings.generate_warnings(transition_errors, Pg.significant_rgts_under_thresh)
+    # print_transition_errors(transition_errors)
+    # print_transition_errors(singular_point_errors)
+    # print(f'Num cross: {len(Pg.crossing_rgts)}')
+    # print(Pg.crossing_rgts)
 
 
-def print_transition_errors(transition_errors):
-    print('Potential Transition Errors')
-    for rgt in transition_errors:
-        print(f'Rgt: {rgt}')
-
-    print(f'Num errors: {len(transition_errors)}')
-
-
-def test(segments):
-    mask_segments = [LineString(Conversions.cartesian_list_to_gcs(segment.line_string.coords))
-                     for segment in segments if segment.state == State.RGT]
-
-    land_segments = [LineString(Conversions.cartesian_list_to_gcs(segment.line_string.coords))
-                     for segment in segments if segment.state == State.VEGETATION]
-
-    ocean_segments = [LineString(Conversions.cartesian_list_to_gcs(segment.line_string.coords))
-                      for segment in segments if segment.state == State.OCEAN]
-
-    # Multi Line String
-    if len(mask_segments) != 0:
-        print("MASK: ")
-        KmlTester.create_file_multiline(MultiLineString(mask_segments))
-    if len(land_segments) != 0:
-        print("LAND: ")
-        KmlTester.create_file_multiline(MultiLineString(land_segments))
-    if len(ocean_segments) != 0:
-        print("OCEAN: ")
-        KmlTester.create_file_multiline(MultiLineString(ocean_segments))
+# def print_transition_errors(transition_errors):
+#     print('Potential Transition Errors')
+#     for rgt in transition_errors:
+#         print(f'Rgt: {rgt}')
+#
+#     print(f'Num errors: {len(transition_errors)}')
+#
+#
+# def test(segments):
+#     mask_segments = [LineString(Conversions.cartesian_list_to_gcs(segment.line_string.coords))
+#                      for segment in segments if segment.state == State.RGT]
+#
+#     land_segments = [LineString(Conversions.cartesian_list_to_gcs(segment.line_string.coords))
+#                      for segment in segments if segment.state == State.VEGETATION]
+#
+#     ocean_segments = [LineString(Conversions.cartesian_list_to_gcs(segment.line_string.coords))
+#                       for segment in segments if segment.state == State.OCEAN]
+#
+#     # Multi Line String
+#     if len(mask_segments) != 0:
+#         print("MASK: ")
+#         KmlTester.create_file_multiline(MultiLineString(mask_segments))
+#     if len(land_segments) != 0:
+#         print("LAND: ")
+#         KmlTester.create_file_multiline(MultiLineString(land_segments))
+#     if len(ocean_segments) != 0:
+#         print("OCEAN: ")
+#         KmlTester.create_file_multiline(MultiLineString(ocean_segments))
 
 
 if __name__ == '__main__':
