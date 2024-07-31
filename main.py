@@ -13,6 +13,8 @@ import os
 import traceback
 import Warnings
 import gui
+import shutil
+import download
 
 
 def main():
@@ -181,7 +183,13 @@ def main():
     transition_errors = Pg.generate_transition_errors(points_dict)
     # singular_point_errors = Pg.singular_point_errors(points_dict)
     Warnings.generate_warnings(transition_errors, Pg.significant_rgts_under_thresh, points_dict, Pg.MIN_TRANSITION_DIST)
-    gui.download_files()
+
+    source_directory = os.path.join(os.getcwd(), "assets")
+    files = ['new_points.csv', 'warnings.txt']
+    for filename in files:
+        source_path = os.path.join(source_directory, filename)
+        destination_path = os.path.join(gui.files_destination, filename)
+        shutil.copy(source_path, destination_path)
     # print_transition_errors(transition_errors)
     # print_transition_errors(singular_point_errors)
     # print(f'Num cross: {len(Pg.crossing_rgts)}')

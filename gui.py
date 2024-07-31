@@ -1,15 +1,18 @@
 import tkinter as tk
 from tkinter import filedialog, messagebox, simpledialog
-import shutil
-import os
 
 # Global variables to store user inputs
 mask_filetype = None
 mask_region_type = None
 mask_filepath = None
 transition_csv_path = None
-# rgt_folder_path = None
+files_destination = None
 threshold_kilometers = None
+
+
+def processing(param):
+    # root.title("Processing...")
+    proceed_to_next(question_label, *buttons)
 
 
 def set_mask_filetype(filetype):
@@ -38,19 +41,18 @@ def select_transition_csv():
         proceed_to_next(question_label, button)
 
 
-# def select_rgt_folder():
-#     global rgt_folder_path
-#     rgt_folder_path = filedialog.askdirectory(title="Select Folder with RGTs")
-#     if rgt_folder_path:
-#         proceed_to_next(question_label, button)
-
-
 def enter_threshold_kilometers():
     global threshold_kilometers
     threshold_kilometers = simpledialog.askfloat("Enter Threshold Kilometers", "Enter Threshold Kilometers:")
     if threshold_kilometers is not None:
         proceed_to_next(button)
 
+
+def select_files_folder():
+    global files_destination
+    files_destination = filedialog.askdirectory(title="Select Folder to Store Files")
+    if files_destination:
+        proceed_to_next(question_label, button)
 
 def proceed_to_next(*widgets):
     for widget in widgets:
@@ -59,19 +61,15 @@ def proceed_to_next(*widgets):
 
 
 steps = [
+    lambda: setup_question("The program will take ~2 mins to process", ["Continue"], processing),
     lambda: setup_question("Is the mask a kml or shapefile?", ["KML", "Shapefile"], set_mask_filetype),
     lambda: setup_question("Is the mask region an off-pointing or RGT?", ["Off-Pointing", "RGT"], set_mask_region_type),
     lambda: setup_file_selection("Select mask file:", select_mask_filepath),
     lambda: setup_file_selection("Select Transition Point csv file:", select_transition_csv),
-    # lambda: setup_folder_selection("Select folder with 1387 RGTs:", select_rgt_folder),
-    lambda: setup_threshold_kilometers(),
-    lambda: processing()
+    lambda: setup_folder_selection("Select folder to Store files", select_files_folder),
+    lambda: setup_threshold_kilometers()
 ]
 
-
-def processing():
-    root.title("Processing...")
-    proceed_to_next()
 
 def setup_question(question, options, command):
     global question_label, buttons
@@ -106,7 +104,9 @@ def step():
     if steps:
         steps.pop(0)()
     else:
+        root.withdraw()
         root.quit()
+        root.destroy()
 
 
 def run():
@@ -120,25 +120,7 @@ def run():
     root.mainloop()
 
 
-def copy_files_to_directory():
-    global root
-    directory = filedialog.askdirectory()
-
-    source_directory = os.path.join(os.getcwd(), "assets")
-    # copy_files_to_directory(source_directory, directory)
-    files = ['new_points.csv', 'warnings.txt']
-    for filename in files:
-        source_path = os.path.join(source_directory, filename)
-        destination_path = os.path.join(directory, filename)
-        shutil.copy(source_path, destination_path)
-
-    root.withdraw()
-    root.quit()
 
 
-def download_files():
-    global root
-    root = tk.Tk()
-    root.title("Select a folder to download assets files")
-    root.geometry("400x300")
-    copy_files_to_directory()
+# Downloading:
+
