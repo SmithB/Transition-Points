@@ -1,12 +1,14 @@
 import tkinter as tk
 from tkinter import filedialog, messagebox, simpledialog
+import shutil
+import os
 
 # Global variables to store user inputs
 mask_filetype = None
 mask_region_type = None
 mask_filepath = None
 transition_csv_path = None
-rgt_folder_path = None
+# rgt_folder_path = None
 threshold_kilometers = None
 
 
@@ -36,11 +38,11 @@ def select_transition_csv():
         proceed_to_next(question_label, button)
 
 
-def select_rgt_folder():
-    global rgt_folder_path
-    rgt_folder_path = filedialog.askdirectory(title="Select Folder with RGTs")
-    if rgt_folder_path:
-        proceed_to_next(question_label, button)
+# def select_rgt_folder():
+#     global rgt_folder_path
+#     rgt_folder_path = filedialog.askdirectory(title="Select Folder with RGTs")
+#     if rgt_folder_path:
+#         proceed_to_next(question_label, button)
 
 
 def enter_threshold_kilometers():
@@ -61,10 +63,15 @@ steps = [
     lambda: setup_question("Is the mask region an off-pointing or RGT?", ["Off-Pointing", "RGT"], set_mask_region_type),
     lambda: setup_file_selection("Select mask file:", select_mask_filepath),
     lambda: setup_file_selection("Select Transition Point csv file:", select_transition_csv),
-    lambda: setup_folder_selection("Select folder with 1387 RGTs:", select_rgt_folder),
-    lambda: setup_threshold_kilometers()
+    # lambda: setup_folder_selection("Select folder with 1387 RGTs:", select_rgt_folder),
+    lambda: setup_threshold_kilometers(),
+    lambda: processing()
 ]
 
+
+def processing():
+    root.title("Processing...")
+    proceed_to_next()
 
 def setup_question(question, options, command):
     global question_label, buttons
@@ -113,5 +120,25 @@ def run():
     root.mainloop()
 
 
-if __name__ == '__main__':
-    run()
+def copy_files_to_directory():
+    global root
+    directory = filedialog.askdirectory()
+
+    source_directory = os.path.join(os.getcwd(), "assets")
+    # copy_files_to_directory(source_directory, directory)
+    files = ['new_points.csv', 'warnings.txt']
+    for filename in files:
+        source_path = os.path.join(source_directory, filename)
+        destination_path = os.path.join(directory, filename)
+        shutil.copy(source_path, destination_path)
+
+    root.withdraw()
+    root.quit()
+
+
+def download_files():
+    global root
+    root = tk.Tk()
+    root.title("Select a folder to download assets files")
+    root.geometry("400x300")
+    copy_files_to_directory()

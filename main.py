@@ -12,23 +12,36 @@ import AscReq
 import os
 import traceback
 import Warnings
+import gui
 
 
 def main():
-    off_pointing = False
+
+    gui.run()
+    kml = True if gui.mask_filetype == 'KML' else False
+    off_pointing = True if gui.mask_region_type == 'Off-Pointing' else False
+    mask_filepath = gui.mask_filepath
+    transition_csv_path = gui.transition_csv_path
+    threshold_kilometers = gui.threshold_kilometers
+
+    # off_pointing = False
 
     if off_pointing:
         import PointerGenerator as Pg
     else:
         import CombinePointGenerator as Pg
 
-    kml = False
+    Pg.MIN_TRANSITION_DIST = threshold_kilometers
+
+    # kml = False
 
     if kml:
-        mask_gcs_coords = Kr.parse_mask('/Users/pvelmuru/Desktop/snow_depth_mask.kml')
+        # mask_gcs_coords = Kr.parse_mask('/Users/pvelmuru/Desktop/snow_depth_mask.kml')
+        mask_gcs_coords = Kr.parse_mask(mask_filepath)
     else:
         try:
-            mask_gcs_coords = Kr.parse_mask(ShpConverter.shp_to_kml('/Users/pvelmuru/Downloads/AntarcticaGreenland'))
+            # mask_gcs_coords = Kr.parse_mask(ShpConverter.shp_to_kml('/Users/pvelmuru/Downloads/AntarcticaGreenland'))
+            mask_gcs_coords = Kr.parse_mask(ShpConverter.shp_to_kml(mask_filepath))
         except:
             traceback.print_exc()
 
@@ -36,7 +49,8 @@ def main():
     mask_polygons_cart = [Polygon(Conversions.gcs_list_to_cartesian(coords)) for coords in mask_gcs_coords]
     mask_multipolygon = shapely.make_valid(MultiPolygon(mask_polygons_cart))
 
-    land_gcs_coords = Kr.parse_mask( '/Users/pvelmuru/Desktop/accurate_land_mask/better/Accurate/land_mask.kml')
+    # land_gcs_coords = Kr.parse_mask( '/Users/pvelmuru/Desktop/accurate_land_mask/better/Accurate/land_mask.kml')
+    land_gcs_coords = Kr.parse_mask('assets/land_mask.kml')
     land_polygon_cart = [Polygon(Conversions.gcs_list_to_cartesian(coordinates)) for coordinates in land_gcs_coords]
     land_multipolygon = shapely.make_valid(MultiPolygon(land_polygon_cart))
 
@@ -49,7 +63,7 @@ def main():
                      for polygon in new_land_multipolygon.geoms]
     new_land_final_multi = shapely.make_valid(MultiPolygon(new_land_cart))
 
-    dir_name = '/Users/pvelmuru/Downloads/IS2_RGTs_cycle12_date_time'
+    dir_name = 'assets/IS2_RGTs_cycle12_date_time'
     ext = '.kml'
 
     file_list = []
@@ -63,7 +77,10 @@ def main():
     points_dict = {}
     for i in range(1, 1388):
         points_dict[i] = []
-    points_dict = Ch.read_csv('/Users/pvelmuru/PycharmProjects/Transistion Points/RGT_transition_locations_V2.0 1.csv',
+    # points_dict = Ch.read_csv('/Users/pvelmuru/PycharmProjects/Transistion Points/RGT_transition_locations_V2.0 1.csv',
+    #                           points_dict)
+
+    points_dict = Ch.read_csv(transition_csv_path,
                               points_dict)
 
     rgt = 1
@@ -158,11 +175,13 @@ def main():
     Pg.remove_duplicate_points(points_dict)
     Pg.remove_extra_endpoints(points_dict)
 
-    Ch.write_csv('/Users/pvelmuru/Desktop/testwrite.csv', points_dict)
+    # Ch.write_csv('/Users/pvelmuru/Desktop/testwrite.csv', points_dict)
+    Ch.write_csv('assets/new_points.csv', points_dict)
 
     transition_errors = Pg.generate_transition_errors(points_dict)
     # singular_point_errors = Pg.singular_point_errors(points_dict)
     Warnings.generate_warnings(transition_errors, Pg.significant_rgts_under_thresh, points_dict, Pg.MIN_TRANSITION_DIST)
+    gui.download_files()
     # print_transition_errors(transition_errors)
     # print_transition_errors(singular_point_errors)
     # print(f'Num cross: {len(Pg.crossing_rgts)}')
