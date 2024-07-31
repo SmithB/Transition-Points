@@ -162,7 +162,7 @@ def main():
 
     transition_errors = Pg.generate_transition_errors(points_dict)
     # singular_point_errors = Pg.singular_point_errors(points_dict)
-    Warnings.generate_warnings(transition_errors, Pg.significant_rgts_under_thresh)
+    Warnings.generate_warnings(transition_errors, Pg.significant_rgts_under_thresh, points_dict, Pg.MIN_TRANSITION_DIST)
     # print_transition_errors(transition_errors)
     # print_transition_errors(singular_point_errors)
     # print(f'Num cross: {len(Pg.crossing_rgts)}')

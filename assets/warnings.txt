@@ -1,8 +1,39 @@
 Errors:
 RGT: 915 
+Distance Errors:
+RGT: 54  3
+RGT: 107  3
+RGT: 108  2
+RGT: 115  5
+RGT: 168  2
+RGT: 176  5
+RGT: 237  5
+RGT: 298  5
+RGT: 359  5
+RGT: 367  1
+RGT: 496  3
+RGT: 557  3
+RGT: 610  2
+RGT: 610  3
+RGT: 618  5
+RGT: 679  5
+RGT: 740  5
+RGT: 801  5
+RGT: 870  1
+RGT: 938  3
+RGT: 999  3
+RGT: 1009  1
+RGT: 1052  3
+RGT: 1060  5
+RGT: 1121  5
+RGT: 1182  5
+RGT: 1243  5
+RGT: 1304  5
+RGT: 1312  1
+RGT: 1380  3
+
 
 Warnings:
-
 RGTs where large segments under threshold were skipped:
 RGT: 39
 RGT: 64
@@ -62,4 +93,15 @@ RGT: 1350
 RGT: 1354
 RGT: 1365
 RGT: 1366
+
 RGTs where there are multiple Transition Points in a 1500 km distance:
+RGT: 107  2
+RGT: 168  2
+RGT: 367  1
+RGT: 428  1
+RGT: 610  2
+RGT: 870  1
+RGT: 1052  2
+RGT: 1312  1
+
+Good Luck!

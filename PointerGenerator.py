@@ -11,6 +11,7 @@ WARNING_THRESH = 500  # Kilometers
 significant_rgts_under_thresh = []
 curr_rgt = 0
 
+
 def split_ani_meridian(rgt):
 
     global curr_rgt
@@ -201,7 +202,6 @@ def sort_segments_by_coordinates(segments, starting_coordinate):
     return sorted_segments
 
 
-# TODO Add warning somehow when removing segment
 def remove_segments_under_thresh(segments):
     """
     Removes line segments that are under the minimum distance threshold
@@ -238,7 +238,6 @@ def remove_segments_under_thresh(segments):
     return clean_segments
 
 
-# TODO make sure that segment is overlapping another segment before filtering it out
 def remove_insignificant_segments(segments):
     """
     Removes extraneous segments that are inconsequential
@@ -316,11 +315,11 @@ def remove_twilight_points(points_dict):
             point = points_dict[rgt][i]
             longitude, latitude = Conversions.cartesian_to_gcs(point.longitude, point.latitude)
             if longitude > 179.888:
-                if -33.5 <= latitude <= 4 and point.created:  # turn into constants
+                if -33.5 <= latitude <= 4 and point.created:
                     points_dict[rgt].pop(i)
                     i -= 1
             elif longitude < -179.888:
-                if -33.5 <= latitude <= 4 and point.created:   # TODO setting bounds to [-88, 88] removes extraneous points, but it is a bandage fix
+                if -33.5 <= latitude <= 4 and point.created:
                     points_dict[rgt].pop(i)
                     i -= 1
 
@@ -342,8 +341,6 @@ def remove_duplicate_points(points_dict):
 
             else:
                 if last_point.latitude == curr_point.latitude and last_point.longitude == curr_point.longitude:
-                    # print(rgt)
-                    # breakpoint()
                     points_dict[rgt].pop(i)
                     points_dict[rgt].pop(i - 1)
                     last_point = None
