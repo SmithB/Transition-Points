@@ -56,6 +56,6 @@ def points_within_threshold(points_dict, threshold):
             length = Conversions.get_geodesic_length(line)
 
             if length < threshold:
-                rgts.append(f'{rgt}  {i}')
+                rgts.append(f'{rgt}  {i} {length}')
 
     return rgts

@@ -29,9 +29,9 @@ def main():
     # off_pointing = False
 
     if off_pointing:
-        import PointerGenerator as Pg
-    else:
         import CombinePointGenerator as Pg
+    else:
+        import PointerGenerator as Pg
 
     Pg.MIN_TRANSITION_DIST = threshold_kilometers
 
@@ -56,7 +56,7 @@ def main():
     land_polygon_cart = [Polygon(Conversions.gcs_list_to_cartesian(coordinates)) for coordinates in land_gcs_coords]
     land_multipolygon = shapely.make_valid(MultiPolygon(land_polygon_cart))
 
-    if off_pointing:
+    if not off_pointing:
         new_land_multipolygon = Intersections.modify_land_mask(land_multipolygon, mask_multipolygon)  # RETURNS back GCS
     else:
         new_land_multipolygon = Intersections.combine_land_mask(land_multipolygon, mask_multipolygon)
@@ -82,8 +82,7 @@ def main():
     # points_dict = Ch.read_csv('/Users/pvelmuru/PycharmProjects/Transistion Points/RGT_transition_locations_V2.0 1.csv',
     #                           points_dict)
 
-    points_dict = Ch.read_csv(transition_csv_path,
-                              points_dict)
+    points_dict = Ch.read_csv(transition_csv_path, points_dict)
 
     rgt = 1
     start_latitude = 0.0279589282518
@@ -125,7 +124,7 @@ def main():
         else:
             segments_combined = []
             for i in range(len(segments)):
-                if off_pointing:
+                if not off_pointing:
                     segments_clean = Pg.segmentation(mask_multipolygon, new_land_final_multi,
                                                      LineString(
                                                          Conversions.gcs_list_to_cartesian(list(segments[i].coords))))
@@ -176,6 +175,7 @@ def main():
     Pg.remove_twilight_points(points_dict)
     Pg.remove_duplicate_points(points_dict)
     Pg.remove_extra_endpoints(points_dict)
+    Pg.remove_points_under_threshold(points_dict, Pg.MIN_TRANSITION_DIST)
 
     # Ch.write_csv('/Users/pvelmuru/Desktop/testwrite.csv', points_dict)
     Ch.write_csv('assets/new_points.csv', points_dict)

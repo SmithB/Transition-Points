@@ -362,6 +362,22 @@ def remove_extra_endpoints(points_dict):
             points_dict[i + 1].pop(0)
 
 
+def remove_points_under_threshold(points_dict, threshold):
+    for rgt in range(1, 1388):
+        i = 0
+        while i < len(points_dict[rgt]) - 1:
+            points = points_dict[rgt]
+            point1 = Point(Conversions.cartesian_to_gcs(points[i].longitude, points[i].latitude))
+            point2 = Point(Conversions.cartesian_to_gcs(points[i + 1].longitude, points[i + 1].latitude))
+            line = LineString([point1, point2])
+            length = Conversions.get_geodesic_length(line)
+            if length < threshold:
+                points_dict[rgt].pop(i + 1)
+                points_dict[rgt].pop(i)
+                i -= 1
+            i += 1
+
+
 def generate_transition_errors(points_dict):
     transition_errors = []
 
