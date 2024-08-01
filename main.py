@@ -91,7 +91,7 @@ def main():
 
         segments = Pg.split_ani_meridian(LineString(Conversions.cartesian_list_to_gcs(list(orbit_line.coords))))
 
-        print(f'rgt {rgt} len ', len(segments))
+        # print(f'rgt {rgt} len ', len(segments))
 
         if len(segments) == 1:
             if off_pointing:
@@ -145,16 +145,16 @@ def main():
                 start_latitude = coordinates[1]
 
             segments_combined = Pg.merge_corresponding_segments(segments_combined)
-            print('Num Segments: ', len(segments_combined))
-            print([(segment.state, segment.length) for segment in segments_combined])
+            # print('Num Segments: ', len(segments_combined))
+            # print([(segment.state, segment.length) for segment in segments_combined])
             segments_combined = Pg.assign_points(rgt, points_dict, segments_combined)
             # print([segment.points for segment in segments_combined])
 
             segments_combined = algo.validate_points(segments_combined, rgt)
 
-            print([(i, point.state) for i, segment in enumerate(segments_combined) for point in segment.points])
+            # print([(i, point.state) for i, segment in enumerate(segments_combined) for point in segment.points])
             points_dict[rgt] = []
-            print(f'rgt: {rgt}: ')
+            # print(f'rgt: {rgt}: ')
             for segment in segments_combined:
                 # print(segment.state, segment.length)
                 if len(segment.points) != 0:

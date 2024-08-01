@@ -66,7 +66,7 @@ steps = [
     lambda: setup_question("Is the mask region an off-pointing or RGT?", ["Off-Pointing", "RGT"], set_mask_region_type),
     lambda: setup_file_selection("Select mask file:", select_mask_filepath),
     lambda: setup_file_selection("Select Transition Point csv file:", select_transition_csv),
-    lambda: setup_folder_selection("Select folder to Store files", select_files_folder),
+    lambda: setup_folder_selection("Select Folder to Store Files", select_files_folder),
     lambda: setup_threshold_kilometers()
 ]
 
