@@ -1,12 +1,10 @@
 import Intersections
 import KmlReader as Kr
-import KmlTester
 import Conversions
-from shapely import LineString, MultiPolygon, Polygon, MultiLineString
+from shapely import LineString, MultiPolygon, Polygon
 import shapely
 import algo
 import ShpConverter
-from Segment import State
 import CsvHandler as Ch
 import AscReq
 import os
@@ -14,7 +12,6 @@ import traceback
 import Warnings
 import gui
 import shutil
-import download
 
 
 def main():
@@ -52,7 +49,7 @@ def main():
     mask_multipolygon = shapely.make_valid(MultiPolygon(mask_polygons_cart))
 
     # land_gcs_coords = Kr.parse_mask( '/Users/pvelmuru/Desktop/accurate_land_mask/better/Accurate/land_mask.kml')
-    land_gcs_coords = Kr.parse_mask('assets/land_mask.kml')
+    land_gcs_coords = Kr.parse_mask(os.path.join('assets', 'land_mask.kml'))
     land_polygon_cart = [Polygon(Conversions.gcs_list_to_cartesian(coordinates)) for coordinates in land_gcs_coords]
     land_multipolygon = shapely.make_valid(MultiPolygon(land_polygon_cart))
 
@@ -65,7 +62,7 @@ def main():
                      for polygon in new_land_multipolygon.geoms]
     new_land_final_multi = shapely.make_valid(MultiPolygon(new_land_cart))
 
-    dir_name = 'assets/IS2_RGTs_cycle12_date_time'
+    dir_name = os.path.join('assets', 'IS2_RGTs_cycle12_date_time')
     ext = '.kml'
 
     file_list = []
@@ -88,7 +85,7 @@ def main():
     start_latitude = 0.0279589282518
     start_longitude = -0.131847178124
     for file in file_list:
-        orbit_gcs = Kr.get_coordinates_from_kml(dir_name + '/' + file)
+        orbit_gcs = Kr.get_coordinates_from_kml(os.path.join(dir_name, file))
         orbit_cart = Conversions.gcs_list_to_cartesian(orbit_gcs)
         orbit_line = shapely.make_valid(LineString(orbit_cart))
 
@@ -178,7 +175,7 @@ def main():
     Pg.remove_points_under_threshold(points_dict, Pg.MIN_TRANSITION_DIST)
 
     # Ch.write_csv('/Users/pvelmuru/Desktop/testwrite.csv', points_dict)
-    Ch.write_csv('assets/new_points.csv', points_dict)
+    Ch.write_csv(os.path.join('assets', 'new_points.csv'), points_dict)
 
     transition_errors = Pg.generate_transition_errors(points_dict)
     # singular_point_errors = Pg.singular_point_errors(points_dict)
