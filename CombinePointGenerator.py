@@ -315,8 +315,6 @@ def remove_duplicate_points(points_dict):
 
             else:
                 if last_point.latitude == curr_point.latitude and last_point.longitude == curr_point.longitude:
-                    print(rgt)
-                    breakpoint()
                     points_dict[rgt].pop(i)
                     points_dict[rgt].pop(i - 1)
                     last_point = None

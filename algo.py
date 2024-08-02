@@ -15,7 +15,6 @@ def validate_points(segments, rgt):
     i = 0
     while i < len(segments):
         num_points = len(segments[i].points)
-        print(i, num_points, segments[i].state)
 
         if i == len(segments) - 1:
             if 0 < num_points <= 2:

@@ -1,22 +1,56 @@
-import os.path
-import tkinter as tk
-from tkinter import filedialog
+import csv
+import os
+import shutil
+
+import Conversions
+from Point import Point, TypePoint
 
 
-def get_file_path():
-    root = tk.Tk()
-    root.withdraw()
+def read_csv(filename, points_dict):
+    """
+    Reads file and fills up points_dict with Point objects
+    :param filename: Csv file names
+    :param points_dict: dictionary to fill with Point objects
+    :return: populated points_dict
+    """
+    with open(filename, newline='') as csvfile:
+        reader = csv.reader(csvfile, delimiter=',')
+        next(reader)  # Skips headers
+        try:
+            for row in reader:
+                rgt, type_point, latitude, longitude = int(row[0]), int(row[2]), float(row[3]), float(row[4])
+                asc_req = int(row[5])
 
-    filepath = filedialog.askopenfilename()
-    return filepath
+                state = TypePoint.RGT if type_point == 0 else TypePoint.VEGETATION
+
+                point = Point(rgt, state, latitude, longitude, asc_req)
+                points_dict[rgt].append(point)
+            return points_dict
+        except Exception as e:
+            print(e)
+            print('CSV File format invalid')
+            return None
 
 
-def download_file(temp_file_path, file_name):
-    root = tk.Tk()
-    root.withdraw()
+def write_csv(filename, points_dict):
+    """
 
-    directory = filedialog.askdirectory()
-    save_path = os.path.join(directory, file_name)
+    :param filename: file name to write to
+    :param points_dict: dictionary to get information from
+    """
+    with open(filename, 'w', newline='') as csvfile:
+        writer = csv.writer(csvfile, delimiter=',')
+        writer.writerow(['rgt', 'trans_type', 'lat', 'lon', 'asc_req'])
+        for rgt in points_dict:
+            for point in points_dict[rgt]:
+                gcs_coords = Conversions.cartesian_to_gcs(point.longitude, point.latitude)
+                writer.writerow([point.rgt, point.state.value, gcs_coords[1], gcs_coords[0], point.asc_req])
 
-    with open(temp_file_path, 'r') as src, open(save_path, 'w') as dst:
-        dst.write(src.read())
+
+def download_files(files_destination):
+    source_directory = os.path.join(os.getcwd(), "assets")
+    files = ['new_points.csv', 'warnings.txt']
+    for filename in files:
+        source_path = os.path.join(source_directory, filename)
+        destination_path = os.path.join(files_destination, filename)
+        shutil.copy(source_path, destination_path)

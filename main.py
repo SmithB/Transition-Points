@@ -5,13 +5,13 @@ from shapely import LineString, MultiPolygon, Polygon
 import shapely
 import algo
 import ShpConverter
-import CsvHandler as Ch
+import FileManager as Fm
 import AscReq
 import os
 import traceback
 import Warnings
 import gui
-import shutil
+from tqdm import tqdm
 
 
 def main():
@@ -70,11 +70,12 @@ def main():
     for i in range(1, 1388):
         points_dict[i] = []
 
-    points_dict = Ch.read_csv(transition_csv_path, points_dict)
+    points_dict = Fm.read_csv(transition_csv_path, points_dict)
 
     rgt = 1
     start_latitude = 0.0279589282518
     start_longitude = -0.131847178124
+    pbar = tqdm(total=1387, desc='Processing', colour='blue')
     for file in file_list:
         orbit_gcs = Kr.get_coordinates_from_kml(os.path.join(dir_name, file))
         orbit_cart = Conversions.gcs_list_to_cartesian(orbit_gcs)
@@ -101,7 +102,6 @@ def main():
 
             points_dict[rgt] = []
             for segment in segments_clean:
-                print(segment.state, segment.length)
                 if len(segment.points) != 0:
                     for point in segment.points:
                         points_dict[rgt].append(point)
@@ -150,23 +150,19 @@ def main():
         gcs_coords = cart_coords[0], cart_coords[1]
         start_longitude = gcs_coords[0]
         start_latitude = gcs_coords[1]
+        pbar.update(1)
 
     Pg.remove_twilight_points(points_dict)
     Pg.remove_duplicate_points(points_dict)
     Pg.remove_extra_endpoints(points_dict)
     Pg.remove_points_under_threshold(points_dict, Pg.MIN_TRANSITION_DIST)
 
-    Ch.write_csv(os.path.join('assets', 'new_points.csv'), points_dict)
+    Fm.write_csv(os.path.join('assets', 'new_points.csv'), points_dict)
 
     transition_errors = Pg.generate_transition_errors(points_dict)
     Warnings.generate_warnings(transition_errors, Pg.significant_rgts_under_thresh, points_dict, Pg.MIN_TRANSITION_DIST)
 
-    source_directory = os.path.join(os.getcwd(), "assets")
-    files = ['new_points.csv', 'warnings.txt']
-    for filename in files:
-        source_path = os.path.join(source_directory, filename)
-        destination_path = os.path.join(gui.files_destination, filename)
-        shutil.copy(source_path, destination_path)
+    Fm.download_files(gui.files_destination)
 
 
 if __name__ == '__main__':
