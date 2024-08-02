@@ -12,7 +12,7 @@ MIN_TRANSITION_DIST = 550  # Kilometers
 WARNING_THRESH = 500  # Kilometers
 
 
-def split_ani_meridian(rgt):
+def split_anti_meridian(rgt):
     coords = list(rgt.coords)
     segments = []
 

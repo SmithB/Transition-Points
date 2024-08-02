@@ -12,7 +12,7 @@ significant_rgts_under_thresh = []
 curr_rgt = 0
 
 
-def split_ani_meridian(rgt):
+def split_anti_meridian(rgt):
     global curr_rgt
     curr_rgt += 1
 
