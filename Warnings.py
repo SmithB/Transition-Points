@@ -7,21 +7,21 @@ def generate_warnings(transition_errors, significant_rgts_under_thresh, points_d
     rgts_within_thresh = points_within_threshold(points_dict, threshold)
     with open('assets/warnings.txt', 'w') as file:
         file.write('Errors:\n')
-        for error in transition_errors:
+        for error in set(transition_errors):
             file.write(f'RGT: {error} \n')
 
         file.write('Distance Errors:\n')
-        for rgt in rgts_within_thresh:
+        for rgt in set(rgts_within_thresh):
             file.write(f'RGT: {rgt}\n')
         file.write("\n\n")
 
         file.write('Warnings:\n')
         file.write('RGTs where large segments under threshold were skipped:\n')
-        for rgt in significant_rgts_under_thresh:
+        for rgt in set(significant_rgts_under_thresh):
             file.write(f'RGT: {rgt}\n')
 
         file.write('RGTs where there are multiple Transition Points in a 1500 km distance:\n')
-        for rgt in too_close_rgts:
+        for rgt in set(too_close_rgts):
             file.write(f'RGT: {rgt}\n')
         file.write('\nGood Luck!')
 
