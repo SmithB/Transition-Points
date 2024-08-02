@@ -26,30 +26,22 @@ def validate_points(segments, rgt):
                         segments[i].points.pop(0)
                         break
                     else:
-                        # print('add point')
-                        # print(segments[i].state.value, segments[i].points[0].state.value)
-                        # # Not too sure tbh
-                        # segments[i].points = []
-                        print('ERROR 8')
                         break
                 else:
                     if num_points == 1:
                         if segments[i].state.value == segments[i].points[0].state.value:
                             segments[i].points = []
-                            # print('ERROR 9')
                             break
                         else:
                             segments[i].points[0].endpoint = False
                             break
                     else:
                         segments[i].points = []
-                        # print('ERROR 15')
                         break
             elif num_points == 0:
                 break
             else:
                 segments[i].points = []  # Delete them
-                print('ERROR 13')
                 break
 
         if num_points == 1:
@@ -78,14 +70,12 @@ def validate_points(segments, rgt):
                         continue
                 if i < len(segments) - 1:
                     if segments[i].points[1].state.value == segments[i].state.value:
-                        print("pushed forward")
                         segments[i + 1].points.insert(0, segments[i].points[1])
                         segments[i].points.pop()
                         continue
             elif i == 0:
                 if segments[i].points[0].state.value == segments[i].state.value:
                     # This means this point transitions for this segment
-                    # push_up(segments[i])
                     segments[i].points[0].endpoint = False
                 else:
                     if i < len(segments) - 1:
@@ -95,7 +85,6 @@ def validate_points(segments, rgt):
                             push_up(segments[i])
                     else:
                         segments[i].points = []  # Deletes two points as it assumes no state change
-                        # print('ERROR 2')
             else:
                 if len(segments[i - 1].points) == 0:
                     if segments[i].state.value == segments[i].points[0].state.value:
@@ -110,7 +99,6 @@ def validate_points(segments, rgt):
                         continue
                     else:
                         segments[i].points = []  # Deletes two points as it assumes no state change
-                        # print('ERROR 3')
                 else:
                     segments[i].points = []  # Delete the points, hope the next segment has an extra point
 
@@ -129,8 +117,6 @@ def validate_points(segments, rgt):
                             segments[i].points.pop()
                             segments[i].points.pop()
                             continue
-                        else:
-                            print('ERROR 4')
                 else:
                     if segments[i].state.value != segments[i].points[0].state.value:
                         if i < len(segments[i].points) - 1:
@@ -157,8 +143,6 @@ def validate_points(segments, rgt):
                         segments[i].points.pop()
                         segments[i].points.pop()
                         continue
-                    else:
-                        print('ERROR 5')
             else:
                 if len(segments[i - 1].points) == 0:
                     if segments[i].state.value == segments[i].points[0].state.value:
@@ -166,8 +150,6 @@ def validate_points(segments, rgt):
                         segments[i].points.pop(0)
                         push_up(segments[i - 1])
                         continue
-                    else:
-                        print('ERROR 6')  # Rendering issue???
                 elif segments[i].state.value != segments[i].points[0].state.value:
                     if i < len(segments[i].points) - 1:
                         segments[i + 1].insert(0, segments[i].points[-1])
@@ -178,66 +160,15 @@ def validate_points(segments, rgt):
                     else:
                         segments[i].points.pop()
                         segments[i].points.pop()
-                        # print('pop one')
                         continue
-                        # print('ERROR 7')
                 else:
-                    print('deleted three')
                     segments[i].points = []  # Delete the points, hope the next segment has extra point
 
         elif num_points == 4:
             segments[i].points = []
-            # if i == 1:
-            #     if len(segments[0].points) < 2:
-            #         if segments[i].points[0].state.value == segments[i].state.value:
-            #             segments[i - 1].points.append(segments[i].points[0])
-            #             segments[i].points.pop(0)
-            #             push_up(segments[i - 1])
-            #             continue
-            #         else:
-            #             if i < len(segments) - 1:
-            #                 segments[i + 1].points.insert(0, segments[i].points[-1])
-            #                 segments[i + 1].points.insert(0, segments[i].points[-2])
-            #                 segments[i].points.pop()
-            #                 segments[i].points.pop()
-            #                 continue
-            #             else:
-            #                 print('ERROR 4')
-            #     else:
-            #         if segments[i].state.value != segments[i].points[0].state.value:
-            #             if i < len(segments[i].points) - 1:
-            #                 segments[i + 1].points.insert(0, segments[i].points[-1])
-            #                 segments[i + 1].points.insert(0, segments[i].points[-2])
-            #                 segments[i].points.pop()
-            #                 segments[i].points.pop()
-            #                 continue
-            #             else:
-            #                 segments[i].points.pop()  # Deletes the points
-            #                 segments[i].points.pop()
-            #                 continue
-            # if i > 0:
-            #     if len(segments[i - 1].points) == 0:
-            #         if segments[i].points[0].state.value == segments[i].state.value:
-            #             segments[i - 1].points.append(segments[i].points[0])
-            #             segments[i - 1] = push_up(segments[i - 1])
-            #             segments[i].points.pop(0)
-            #             continue
-            #         else:
-            #             print('ERROR 10')
-            #     elif i < len(segments) - 1:
-            #         if len(segments[i + 1].points) == 0:
-            #             if segments[i].points[-1].state.value == segments[i].state.value:
-            #                 segments[i + 1].points.append(segments[i].points[-1])
-            #                 segments[i].points.pop()
-            #                 continue
-            #     else:
-            #         print('ERROR 11')
-            # else:
-            #     print('error 16')
         else:
             if num_points != 0:
                 segments[i].points = []
-                print('ERROR 12')
 
         if i > 0:
             if len(segments[i - 1].points) == 0:

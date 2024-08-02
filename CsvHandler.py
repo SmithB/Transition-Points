@@ -18,7 +18,6 @@ def read_csv(filename, points_dict):
             for row in reader:
                 rgt, type_point, latitude, longitude = int(row[0]), int(row[2]), float(row[3]), float(row[4])
                 asc_req = int(row[5])
-                # print(f'rgt:{rgt} point: {type_point} lat: {latitude} long: {longitude}')
 
                 state = TypePoint.RGT if type_point == 0 else TypePoint.VEGETATION
 

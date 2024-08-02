@@ -13,7 +13,6 @@ WARNING_THRESH = 500  # Kilometers
 
 
 def split_ani_meridian(rgt):
-    # test
     coords = list(rgt.coords)
     segments = []
 
@@ -35,9 +34,6 @@ def split_ani_meridian(rgt):
 
     segments.append(LineString(coords)) if len(coords) > 1 else None
 
-    # if len(segments) == 0:
-    #     segments = [LineString(coords)]
-
     return segments
 
 
@@ -57,12 +53,8 @@ def segmentation(land_mask, rgt):  # Uses modified land Mask
 
     def add_segment(intersections, state):
         if type(intersections) is LineString:
-            # print("LINE String occurs")
             line = LineString(Conversions.cartesian_list_to_gcs(list(intersections.coords)))
             length = Conversions.get_geodesic_length(line)
-            # if length == 0.0:
-            #     return
-            # print('LLen: ', length)
             if state is not state.OCEAN:
                 if rgt.overlaps(intersections):
                     segment = Segment(intersections, state, length)
@@ -76,28 +68,20 @@ def segmentation(land_mask, rgt):  # Uses modified land Mask
                     if rgt.overlaps(intersection):
                         intersection_gcs = LineString(Conversions.cartesian_list_to_gcs(intersection.coords))
                         length = Conversions.get_geodesic_length(intersection_gcs)
-                        # print('lllen: ', length)
                         segment = Segment(intersection, state, length)
                         segments.append(segment)
                 else:
                     intersection_gcs = LineString(Conversions.cartesian_list_to_gcs(intersection.coords))
                     length = Conversions.get_geodesic_length(intersection_gcs)
-                    # print('lllllen: ', length)
                     segment = Segment(intersection, state, length)
                     segments.append(segment)
-    #
-    # rgt_intersections = Intersections.find_intersections(rgt, rgt_mask)
-    # add_segment(rgt_intersections, State.RGT)
-    # rgt_intersections = MultiLineString([segment.line_string for segment in segments if segment.state == State.RGT])
 
     land_intersections = Intersections.find_intersections(rgt, land_mask)
     add_segment(land_intersections, State.VEGETATION)
     land_intersections = MultiLineString([segment.line_string for segment in segments if
                                           segment.state == State.VEGETATION])
 
-    # ocean_intersections = rgt.difference(rgt_intersections)
     ocean_intersections = rgt.difference(land_intersections)
-    # print(type(ocean_intersections))
     if not isinstance(ocean_intersections,LineString):
         ocean_intersections = MultiLineString([line_string for line_string in ocean_intersections.geoms
                                            if not line_string.is_closed and line_string.dwithin(rgt, 1e-8)])
@@ -112,7 +96,6 @@ def merge_touching_segments(segments):
     :param segments: list of Segments
     :return: cleaned list of Segments
     """
-    # mask_segments = [segment for segment in segments if segment.state == State.RGT]
     land_segments = [segment for segment in segments if segment.state == State.VEGETATION]
     ocean_segments = [segment for segment in segments if segment.state == State.OCEAN]
 
@@ -130,7 +113,6 @@ def merge_touching_segments(segments):
             i += 1
         return segments
 
-    # mask_segments = merge(mask_segments)
     land_segments = merge(land_segments)
     ocean_segments = merge(ocean_segments)
     return land_segments + ocean_segments
@@ -143,7 +125,6 @@ def merge_corresponding_segments(segments):
             segment1 = segments[i].line_string
             segment2 = segments[i + 1].line_string
             merge_coords = list(segment1.coords)[:-1] + list(segment2.coords)
-            # print('lengths: ', segments[i].length, segments[i + 1].length)
             new_length = segments[i].length + segments[i + 1].length
             new_segment = Segment(LineString(merge_coords), segments[i].state, new_length)
             segments[i] = new_segment
@@ -164,7 +145,6 @@ def sort_segments_by_coordinates(segments, starting_coordinate):
     """
     sorted_segments = []
     current_coordinate = starting_coordinate
-    print(' coordinate', Conversions.cartesian_to_gcs(current_coordinate[0], current_coordinate[1]))
 
     while segments:
         next_segment = None
@@ -179,8 +159,6 @@ def sort_segments_by_coordinates(segments, starting_coordinate):
 
             start_dist = Conversions.get_geodesic_length(start_line)
             end_dist = Conversions.get_geodesic_length(end_line)
-            # print(start_dist)
-            # print(end_dist)
 
             if start_dist < min_distance:
                 min_distance = start_dist
@@ -193,7 +171,6 @@ def sort_segments_by_coordinates(segments, starting_coordinate):
                 index = i
         if next_segment:
             current_coordinate = next_segment.line_string.coords[-1]
-            print(f' {i} coordinate', Conversions.cartesian_to_gcs(current_coordinate[0], current_coordinate[1]))
             sorted_segments.append(next_segment)
             segments.pop(index)
         else:
@@ -201,7 +178,6 @@ def sort_segments_by_coordinates(segments, starting_coordinate):
     return sorted_segments
 
 
-# TODO Add warning somehow when removing segment
 def remove_segments_under_thresh(segments):
     """
     Removes line segments that are under the minimum distance threshold
@@ -220,7 +196,6 @@ def remove_segments_under_thresh(segments):
         if dist >= MIN_TRANSITION_DIST or index == 0 or index == last_seg_index:
             clean_segments.append(segment)
         elif clean_segments:
-            # print('Removing Segment')  # Warning
             if dist > WARNING_THRESH:
                 global curr_rgt
                 significant_rgts_under_thresh.append(curr_rgt)
@@ -237,7 +212,6 @@ def remove_segments_under_thresh(segments):
     return clean_segments
 
 
-# TODO make sure that segment is overlapping another segment before filtering it out
 def remove_insignificant_segments(segments):
     """
     Removes extraneous segments that are inconsequential
@@ -319,7 +293,7 @@ def remove_twilight_points(points_dict):
                     points_dict[rgt].pop(i)
                     i -= 1
             elif longitude < -179.888:
-                if -33.5 <= latitude <= 4 and point.created:   # TODO setting bounds to [-88, 88] removes extraneous points, but it is a bandage fix
+                if -33.5 <= latitude <= 4 and point.created:
                     points_dict[rgt].pop(i)
                     i -= 1
 
@@ -353,18 +327,14 @@ def remove_duplicate_points(points_dict):
 
             i += 1
 
-# TODO maybe add these changes to the Pg too
+
 def remove_extra_endpoints(points_dict):
     for i in range(1, 1387):
         if points_dict[i][-1].created and not points_dict[i + 1][0].endpoint and points_dict[i][-1].state == points_dict[i + 1][0].state:
-            # print(points_dict[i][-1].created, 'lol')
-            # breakpoint()
             points_dict[i].pop(-1)
 
         elif (points_dict[i + 1][0].created and
               (points_dict[i][-1].state == points_dict[i + 1][0].state)):
-            # print(points_dict[i][-1].created, 'yup')
-            # breakpoint()
             points_dict[i + 1].pop(0)
 
 
@@ -382,6 +352,7 @@ def remove_points_under_threshold(points_dict, threshold):
                 points_dict[rgt].pop(i)
                 i -= 1
             i += 1
+
 
 def generate_transition_errors(points_dict):
     transition_errors = []
@@ -405,14 +376,3 @@ def generate_transition_errors(points_dict):
                 last_point = point
 
     return transition_errors
-
-
-# def singular_point_errors(points_dict):
-#     transition_errors = []
-#
-#     for rgt in range(1, 1388):
-#         num_points = len(points_dict[rgt])
-#         if num_points <= 1:
-#             transition_errors.append(rgt)
-#
-#     return transition_errors

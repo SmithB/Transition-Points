@@ -4,10 +4,6 @@ import Conversions
 
 
 def generate_asc_req(coords, points):
-
-    # threshold = 40  # kilometers
-    # coords = list(line.coords)
-
     segment1 = None
     segment2 = None
 

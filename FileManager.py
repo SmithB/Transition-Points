@@ -20,8 +20,3 @@ def download_file(temp_file_path, file_name):
 
     with open(temp_file_path, 'r') as src, open(save_path, 'w') as dst:
         dst.write(src.read())
-
-# file_path = get_file_path()
-# print(file_path)
-#
-# download_file(file_path, "lop.csv")

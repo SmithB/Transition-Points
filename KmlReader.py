@@ -30,8 +30,6 @@ def parse_placemark(placemark, coordinates):
         coordinates.extend(placemark.geometry.coords)
     elif isinstance(placemark.geometry, Polygon):
         coordinates.extend(placemark.geometry.exterior.coords)
-    # elif isinstance(placemark.geometry, MultiPolygon):
-    #     coordinates.extend(placemark.geometry.)
     return coordinates
 
 

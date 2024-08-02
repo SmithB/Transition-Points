@@ -11,7 +11,6 @@ threshold_kilometers = None
 
 
 def processing(param):
-    # root.title("Processing...")
     proceed_to_next(question_label, *buttons)
 
 
@@ -53,6 +52,7 @@ def select_files_folder():
     files_destination = filedialog.askdirectory(title="Select Folder to Store Files")
     if files_destination:
         proceed_to_next(question_label, button)
+
 
 def proceed_to_next(*widgets):
     for widget in widgets:
@@ -118,9 +118,3 @@ def run():
     step()
 
     root.mainloop()
-
-
-
-
-# Downloading:
-
