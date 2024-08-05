@@ -234,7 +234,7 @@ def remove_segments_under_thresh(segments):
             # but less than the minimum thresh
             if dist > WARNING_THRESH:
                 global curr_rgt
-                significant_rgts_under_thresh.append(f'{curr_rgt} length: {dist}')
+                significant_rgts_under_thresh.append(f'{curr_rgt} |  Points: {index + 1} to {index + 2} |  length: {dist}')
 
             coords = list(clean_segments[-1].line_string.coords)
             coords.extend(list(segment.line_string.coords))

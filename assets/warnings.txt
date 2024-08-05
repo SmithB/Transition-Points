@@ -5,63 +5,65 @@ Distance Errors:
 
 Warnings:
 RGTs where large segments under threshold were skipped:
-RGT: 384
-RGT: 1159
-RGT: 1289
-RGT: 656
-RGT: 785
-RGT: 1170
-RGT: 405
-RGT: 918
-RGT: 1046
-RGT: 408
-RGT: 282
-RGT: 666
-RGT: 923
-RGT: 285
-RGT: 802
-RGT: 39
-RGT: 423
-RGT: 686
-RGT: 559
-RGT: 1070
-RGT: 561
-RGT: 689
-RGT: 1071
-RGT: 1205
-RGT: 567
-RGT: 184
-RGT: 186
-RGT: 64
-RGT: 448
-RGT: 1350
-RGT: 1224
-RGT: 1354
-RGT: 1227
-RGT: 847
-RGT: 214
-RGT: 727
-RGT: 344
-RGT: 1366
-RGT: 348
-RGT: 221
-RGT: 476
-RGT: 351
-RGT: 224
-RGT: 225
-RGT: 481
-RGT: 1250
-RGT: 100
-RGT: 1129
-RGT: 1003
-RGT: 1131
-RGT: 628
-RGT: 117
-RGT: 760
-RGT: 377
-RGT: 763
-RGT: 125
+RGT: 39 |  Points: 2 to 3 |  length: 515.505047111107
+RGT: 64 |  Points: 8 to 9 |  length: 521.690242246739
+RGT: 100 |  Points: 5 to 6 |  length: 536.908268438154
+RGT: 117 |  Points: 4 to 5 |  length: 547.1572171554839
+RGT: 125 |  Points: 3 to 4 |  length: 530.2144606695125
+RGT: 125 |  Points: 6 to 7 |  length: 538.1450817382121
+RGT: 184 |  Points: 3 to 4 |  length: 508.4665543414904
+RGT: 186 |  Points: 5 to 6 |  length: 519.1568205839463
+RGT: 214 |  Points: 4 to 5 |  length: 521.3929960310318
+RGT: 221 |  Points: 4 to 5 |  length: 505.7239126979817
+RGT: 224 |  Points: 11 to 12 |  length: 525.3371758986909
+RGT: 225 |  Points: 3 to 4 |  length: 533.917829320483
+RGT: 282 |  Points: 3 to 4 |  length: 548.961963673528
+RGT: 285 |  Points: 7 to 8 |  length: 545.445226994792
+RGT: 344 |  Points: 3 to 4 |  length: 505.12104617038267
+RGT: 348 |  Points: 3 to 4 |  length: 505.2153690472529
+RGT: 351 |  Points: 5 to 6 |  length: 529.6080416033235
+RGT: 377 |  Points: 9 to 10 |  length: 514.8275335632067
+RGT: 384 |  Points: 7 to 8 |  length: 530.727701120865
+RGT: 405 |  Points: 3 to 4 |  length: 543.4555802300345
+RGT: 408 |  Points: 5 to 6 |  length: 514.5590813738902
+RGT: 423 |  Points: 6 to 7 |  length: 547.7697918095633
+RGT: 448 |  Points: 3 to 4 |  length: 533.548963003133
+RGT: 476 |  Points: 6 to 7 |  length: 504.80115361113445
+RGT: 481 |  Points: 2 to 3 |  length: 529.6349473089703
+RGT: 559 |  Points: 4 to 5 |  length: 511.6381343177966
+RGT: 561 |  Points: 2 to 3 |  length: 543.8267228208182
+RGT: 567 |  Points: 5 to 6 |  length: 544.4025104660507
+RGT: 628 |  Points: 5 to 6 |  length: 525.5223439514367
+RGT: 656 |  Points: 4 to 5 |  length: 502.81840378656005
+RGT: 666 |  Points: 10 to 11 |  length: 544.9681921159041
+RGT: 686 |  Points: 4 to 5 |  length: 539.9002199514334
+RGT: 689 |  Points: 5 to 6 |  length: 505.06969013147415
+RGT: 727 |  Points: 7 to 8 |  length: 519.487150543503
+RGT: 760 |  Points: 6 to 7 |  length: 510.41464980736055
+RGT: 763 |  Points: 2 to 3 |  length: 545.442825264383
+RGT: 785 |  Points: 3 to 4 |  length: 516.6811237760423
+RGT: 802 |  Points: 5 to 6 |  length: 525.2782631972867
+RGT: 847 |  Points: 3 to 4 |  length: 530.6537058651114
+RGT: 918 |  Points: 6 to 7 |  length: 543.3455764611103
+RGT: 923 |  Points: 2 to 3 |  length: 543.7640798139261
+RGT: 1003 |  Points: 3 to 4 |  length: 519.4465818075803
+RGT: 1046 |  Points: 7 to 8 |  length: 527.3020685320183
+RGT: 1070 |  Points: 5 to 6 |  length: 531.8509243484386
+RGT: 1071 |  Points: 2 to 3 |  length: 519.3033673675527
+RGT: 1129 |  Points: 4 to 5 |  length: 535.8999802498125
+RGT: 1131 |  Points: 5 to 6 |  length: 512.5674452416436
+RGT: 1159 |  Points: 4 to 5 |  length: 539.9460550591647
+RGT: 1170 |  Points: 3 to 4 |  length: 513.9732550978914
+RGT: 1205 |  Points: 2 to 3 |  length: 520.3434992787064
+RGT: 1224 |  Points: 3 to 4 |  length: 526.5728940998727
+RGT: 1224 |  Points: 4 to 5 |  length: 501.03381726092704
+RGT: 1227 |  Points: 3 to 4 |  length: 533.8575320505288
+RGT: 1250 |  Points: 3 to 4 |  length: 511.618805054487
+RGT: 1289 |  Points: 3 to 4 |  length: 517.9893263055712
+RGT: 1350 |  Points: 6 to 7 |  length: 540.3186983189371
+RGT: 1354 |  Points: 2 to 3 |  length: 529.9928681355077
+RGT: 1366 |  Points: 7 to 8 |  length: 523.5014917985599
 RGTs where there are multiple Transition Points in a 1500 km distance:
-RGT: 428  1
+RGT: 428  Points: 2, 3, 4
 
 Good Luck!
