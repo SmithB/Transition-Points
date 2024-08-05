@@ -1,7 +1,11 @@
-import Conversions
-import KmlReader as Kr
+"""
+This module was used simply for testing purposes for debugging generated kml files.
+Prints out geometries in kml format that can put in a kml file to view on Google Earth.
+Author: Pranesh Velmurugan praneshsvels@gmail.com
+Date: 8/5/24
+"""
 from fastkml import kml
-from pygeoif.geometry import Polygon, LineString, MultiPolygon
+from pygeoif.geometry import LineString
 
 
 def create_file(line_given):

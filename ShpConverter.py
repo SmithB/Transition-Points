@@ -1,4 +1,11 @@
+"""
+Module converts a shapefile to a kml file
+Author: Pranesh Velmurugan praneshsvels@gmail.com
+Date: 8/5/24
+"""
+
 import os
+
 import geopandas as gpd
 from fiona.drvsupport import supported_drivers
 

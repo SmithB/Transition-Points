@@ -1,3 +1,10 @@
+"""
+Module contains functions to convert RGT into Segments and assigns initial original points. Also generates errors.
+This function is meant for Off-pointing masks
+Author: Pranesh Velmurugan praneshsvels@gmail.com
+Date: 8/5/24
+"""
+
 from Segment import Segment, State
 import Intersections
 from shapely import LineString, MultiLineString, Point
@@ -5,14 +12,21 @@ import shapely
 import Conversions
 import Point as Pt
 
+# list of RGTs that have segments under the threshold but greater than the warning thresh
 significant_rgts_under_thresh = []
-curr_rgt = 0
 
-MIN_TRANSITION_DIST = 550  # Kilometers
+curr_rgt = 0  # RGT Counter
+
+MIN_TRANSITION_DIST = None  # Kilometers
 WARNING_THRESH = 500  # Kilometers
 
 
 def split_anti_meridian(rgt):
+    """
+    Split a rgt into segments when it intersects the antimeridian to avoid antimeridian issues
+    :param rgt: A LineString containing coordinates in GCS
+    :return: A list of the new segments
+    """
     coords = list(rgt.coords)
     segments = []
 
@@ -24,6 +38,7 @@ def split_anti_meridian(rgt):
         prev_point = coords[i - 1]
         current_point = coords[i]
 
+        # Finds the intersection
         if ((prev_point[0] < -170 and current_point[0] > 170) or
                 (prev_point[0] > 170 and current_point[0] < -170)):
             first_half = coords[:i]
@@ -37,10 +52,10 @@ def split_anti_meridian(rgt):
     return segments
 
 
-def segmentation(land_mask, rgt):  # Uses modified land Mask
+def segmentation(land_mask, rgt):
     """
     Segments the given RGT into sections of veg pointing, rgt pointing,
-    and ocean/polar region rgt pointing
+    and ocean/polar region rgt pointing. Uses modified land Mask
 
     All must use CARTESIAN coordinates
     :param rgt_mask: Polygon/Multipolygon representing the rgt mask
@@ -52,9 +67,17 @@ def segmentation(land_mask, rgt):  # Uses modified land Mask
     segments = []
 
     def add_segment(intersections, state):
+        """
+        Nested function that add segments to list based of intersections and state
+        :param intersections: A geometry that is the intersection between two geometries
+        :param state: State wanted for segments
+        """
+
         if type(intersections) is LineString:
             line = LineString(Conversions.cartesian_list_to_gcs(list(intersections.coords)))
             length = Conversions.get_geodesic_length(line)
+
+            # Does not check for overlap with ocean segments due to floating-point precision errors
             if state is not state.OCEAN:
                 if rgt.overlaps(intersections):
                     segment = Segment(intersections, state, length)
@@ -63,7 +86,9 @@ def segmentation(land_mask, rgt):  # Uses modified land Mask
                 segment = Segment(intersections, state, length)
                 segments.append(segment)
         else:
+            # intersection will usually be a MultiLineString
             for intersection in intersections.geoms:
+                # Does not check for overlap with ocean segments due to floating-point precision errors
                 if state is not state.OCEAN:
                     if rgt.overlaps(intersection):
                         intersection_gcs = LineString(Conversions.cartesian_list_to_gcs(intersection.coords))
@@ -82,11 +107,11 @@ def segmentation(land_mask, rgt):  # Uses modified land Mask
                                           segment.state == State.VEGETATION])
 
     ocean_intersections = rgt.difference(land_intersections)
-    if not isinstance(ocean_intersections,LineString):
+    if not isinstance(ocean_intersections, LineString):
         ocean_intersections = MultiLineString([line_string for line_string in ocean_intersections.geoms
-                                           if not line_string.is_closed and line_string.dwithin(rgt, 1e-8)])
-
+                                               if not line_string.is_closed and line_string.dwithin(rgt, 1e-8)])
     add_segment(ocean_intersections, State.OCEAN)
+
     return segments
 
 
@@ -119,6 +144,12 @@ def merge_touching_segments(segments):
 
 
 def merge_corresponding_segments(segments):
+    """
+    Merges segments that were split by the antimeridian
+    :param segments: list of Segment
+    :return: list of Segments that may have been modified
+    """
+
     i = 0
     while i < len(segments) - 1:
         if segments[i].state == segments[i + 1].state:
@@ -143,6 +174,7 @@ def sort_segments_by_coordinates(segments, starting_coordinate):
     :param starting_coordinate: Tuple of (x, y) Cartesian Coordinates
     :return: list of sorted Segment Objects
     """
+
     sorted_segments = []
     current_coordinate = starting_coordinate
 
@@ -154,19 +186,22 @@ def sort_segments_by_coordinates(segments, starting_coordinate):
             line = segment.line_string
             curr_x, curr_y = Conversions.cartesian_to_gcs(current_coordinate[0], current_coordinate[1])
 
-            start_line = LineString((Point(curr_x, curr_y), Point(Conversions.cartesian_to_gcs(line.coords[0][0], line.coords[0][1]))))
-            end_line = LineString((Point(curr_x, curr_y), Point(Conversions.cartesian_to_gcs(line.coords[-1][0], line.coords[-1][1]))))
+            start_line = LineString((Point(curr_x, curr_y),
+                                     Point(Conversions.cartesian_to_gcs(line.coords[0][0], line.coords[0][1]))))
+            end_line = LineString((Point(curr_x, curr_y),
+                                   Point(Conversions.cartesian_to_gcs(line.coords[-1][0], line.coords[-1][1]))))
 
             start_dist = Conversions.get_geodesic_length(start_line)
             end_dist = Conversions.get_geodesic_length(end_line)
 
+            # Checks both the start distance and end distance to verify that the segment is not backwards
             if start_dist < min_distance:
                 min_distance = start_dist
                 next_segment = segment
                 index = i
             if end_dist < min_distance:
                 min_distance = end_dist
-                next_line = LineString(line.coords[::-1])
+                next_line = LineString(line.coords[::-1])  # Reverses coordinates
                 next_segment = Segment(next_line, segment.state, segment.length)
                 index = i
         if next_segment:
@@ -196,9 +231,12 @@ def remove_segments_under_thresh(segments):
         if dist >= MIN_TRANSITION_DIST or index == 0 or index == last_seg_index:
             clean_segments.append(segment)
         elif clean_segments:
+            # Adds a rgt to the list there is a segment greater than the warning thresh
+            # but less than the minimum thresh
             if dist > WARNING_THRESH:
                 global curr_rgt
                 significant_rgts_under_thresh.append(curr_rgt)
+
             coords = list(clean_segments[-1].line_string.coords)
             coords.extend(list(segment.line_string.coords))
             line = LineString(coords)
@@ -214,7 +252,8 @@ def remove_segments_under_thresh(segments):
 
 def remove_insignificant_segments(segments):
     """
-    Removes extraneous segments that are inconsequential
+    Removes extraneous segments that are inconsequential.
+    These segments may have been generated due to floating-point precision issues
     :param segments: list of all Segments
     :return: clean list of Segment objects
     """
@@ -227,6 +266,8 @@ def remove_insignificant_segments(segments):
         gcs_coords = Conversions.cartesian_list_to_gcs(list(segment.line_string.coords))
         line = LineString(gcs_coords)
         dist = Conversions.get_geodesic_length(line)
+
+        # Ignores first and last segments
         if dist >= 100 or index == 0 or index == last_seg_index:
             clean_segments.append(segment)
         index += 1
@@ -255,6 +296,11 @@ def assign_points(rgt, points_dict, segments):
 
 
 def merge_rgt_ocean(segments):
+    """
+    Function merges rgt and ocean segments if they are next to each other
+    :param segments: list of Segments
+    :return: list of modified Segments
+    """
     segments_clean = [segments[0]]
 
     for i in range(len(segments)):
@@ -264,6 +310,7 @@ def merge_rgt_ocean(segments):
     for i in range(1, len(segments)):
         if segments_clean[-1].state == State.RGT:
             if segments[i].state == State.RGT:
+                # Merges segments
                 coords = list(segments_clean[-1].line_string.coords)
                 coords.extend(segments[i].line_string.coords)
                 new_length = segments_clean[-1].length + segments[i].length
@@ -280,7 +327,7 @@ def merge_rgt_ocean(segments):
 
 def remove_twilight_points(points_dict):
     """
-    Removes extraneous points that were generated near 180 and -180 degrees longitude
+    Removes extraneous points that were generated near antimeridian
     :param points_dict: dictionary containing the transition points for each rgt
     """
     for rgt in range(1, 1388):
@@ -289,11 +336,11 @@ def remove_twilight_points(points_dict):
             point = points_dict[rgt][i]
             longitude, latitude = Conversions.cartesian_to_gcs(point.longitude, point.latitude)
             if longitude > 179.888:
-                if -33.5 <= latitude <= 4 and point.created:  # turn into constants
+                if -33.5 <= latitude <= 4 and point.created:  # These are the bounds of the land mask in that region
                     points_dict[rgt].pop(i)
                     i -= 1
             elif longitude < -179.888:
-                if -33.5 <= latitude <= 4 and point.created:
+                if -33.5 <= latitude <= 4 and point.created:  # These are the bounds of the land mask in that region
                     points_dict[rgt].pop(i)
                     i -= 1
 
@@ -327,6 +374,10 @@ def remove_duplicate_points(points_dict):
 
 
 def remove_extra_endpoints(points_dict):
+    """
+    Removes unnecessary endpoints that were generated by comparing points with the next RGT
+    :param points_dict: dictionary containing list of points
+    """
     for i in range(1, 1387):
         if points_dict[i][-1].created and not points_dict[i + 1][0].endpoint and points_dict[i][-1].state == points_dict[i + 1][0].state:
             points_dict[i].pop(-1)
@@ -337,13 +388,18 @@ def remove_extra_endpoints(points_dict):
 
 
 def remove_points_under_threshold(points_dict, threshold):
+    """
+    Removes a set of points that are under the threshold
+    :param points_dict: dictionary containing list of points
+    :param threshold: the threshold in Km
+    """
     for rgt in range(1, 1388):
         i = 0
         while i < len(points_dict[rgt]) - 1:
             points = points_dict[rgt]
             point1 = Point(Conversions.cartesian_to_gcs(points[i].longitude, points[i].latitude))
             point2 = Point(Conversions.cartesian_to_gcs(points[i + 1].longitude, points[i + 1].latitude))
-            line = LineString([point1, point2])
+            line = LineString([point1, point2])  # Creates line between the two points
             length = Conversions.get_geodesic_length(line)
             if length < threshold:
                 points_dict[rgt].pop(i + 1)
@@ -353,6 +409,11 @@ def remove_points_under_threshold(points_dict, threshold):
 
 
 def generate_transition_errors(points_dict):
+    """
+    Checks for error in RGTs where two consecutive points have the same state
+    :param points_dict: dictionary containing lists of points
+    :return: a list of RGTs with errors
+    """
     transition_errors = []
 
     last_point = None

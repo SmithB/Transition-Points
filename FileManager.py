@@ -1,3 +1,9 @@
+"""
+Module contains functions to read and write csv files. It also contains a function to download files
+Author: Pranesh Velmurugan praneshsvels@gmail.com
+Date: 8/5/24
+"""
+
 import csv
 import os
 import shutil
@@ -34,7 +40,7 @@ def read_csv(filename, points_dict):
 
 def write_csv(filename, points_dict):
     """
-
+    Writes file with the RGT number, State, latitude, longitude, asc_req
     :param filename: file name to write to
     :param points_dict: dictionary to get information from
     """
@@ -48,6 +54,10 @@ def write_csv(filename, points_dict):
 
 
 def download_files(files_destination):
+    """
+    Function download the Transition Points file and the Warnings file to file_destination
+    :param files_destination: Directory to download files to
+    """
     source_directory = os.path.join(os.getcwd(), "assets")
     files = ['new_points.csv', 'warnings.txt']
     for filename in files:

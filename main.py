@@ -1,20 +1,3 @@
-import os
-import traceback
-
-from tqdm import tqdm
-from shapely import LineString, MultiPolygon, Polygon
-import shapely
-
-import Intersections
-import KmlReader as Kr
-import Conversions
-import algo
-import ShpConverter
-import FileManager as Fm
-import AscReq
-import Warnings
-import gui
-
 """
 This script processes Transition Points and a mask to generate new Transition Points based on user inputs from a GUI.
 Supports handling both KML and Shapefile masks. Script uses the RGTs from Cycle 12 to create, delete, and modify the
@@ -37,7 +20,26 @@ Modules:
 
 Author:
     Pranesh Velmurugan praneshsvels@gmail.com
+Date:
+    8/5/24
 """
+
+import os
+import traceback
+
+from tqdm import tqdm
+from shapely import LineString, MultiPolygon, Polygon
+import shapely
+
+import Intersections
+import KmlReader as Kr
+import Conversions
+import algo
+import ShpConverter
+import FileManager as Fm
+import AscReq
+import Warnings
+import gui
 
 
 def main():
@@ -216,11 +218,14 @@ def main():
     Pg.remove_extra_endpoints(points_dict)
     Pg.remove_points_under_threshold(points_dict, Pg.MIN_TRANSITION_DIST)
 
+    # Writes new points to file
     Fm.write_csv(os.path.join('assets', 'new_points.csv'), points_dict)
 
+    # Generates errors and warnings
     transition_errors = Pg.generate_transition_errors(points_dict)
     Warnings.generate_warnings(transition_errors, Pg.significant_rgts_under_thresh, points_dict, Pg.MIN_TRANSITION_DIST)
 
+    # Downloads Files
     Fm.download_files(gui.files_destination)
 
 

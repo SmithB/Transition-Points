@@ -1,5 +1,11 @@
+"""
+Module contains function to create GUI to process user inputs
+Author: Pranesh Velmurugan praneshsvels@gmail.com
+Date: 8/5/24
+"""
+
 import tkinter as tk
-from tkinter import filedialog, messagebox, simpledialog
+from tkinter import filedialog, simpledialog
 
 # Global variables to store user inputs
 mask_filetype = None
@@ -11,6 +17,10 @@ threshold_kilometers = None
 
 
 def processing(param):
+    """
+    Removes question label and buttons the '~2 min' question
+    :param param: Ignores given parameter
+    """
     proceed_to_next(question_label, *buttons)
 
 
@@ -60,6 +70,7 @@ def proceed_to_next(*widgets):
     step()
 
 
+# List of lambda functions that are the steps that the GUI follows
 steps = [
     lambda: setup_question("The program will take ~2 mins to process", ["Continue"], processing),
     lambda: setup_question("Is the mask a kml or shapefile?", ["KML", "Shapefile"], set_mask_filetype),
@@ -101,6 +112,9 @@ def setup_threshold_kilometers():
 
 
 def step():
+    """
+    Progresses through the steps of the GUI
+    """
     if steps:
         steps.pop(0)()
     else:
@@ -110,6 +124,9 @@ def step():
 
 
 def run():
+    """
+    Function initializes GUI
+    """
     global root
     root = tk.Tk()
     root.title("Transition Point Modifier")

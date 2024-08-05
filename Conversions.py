@@ -1,3 +1,8 @@
+"""
+Module contains functions to convert between GCS coordinates and Cartesian coordinates
+Author: Pranesh Velmurugan praneshsvels@gmail.com
+Date: 8/5/24
+"""
 from pyproj import Transformer, Geod
 
 # Transformer objects used to convert units

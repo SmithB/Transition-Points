@@ -1,3 +1,8 @@
+"""
+Module is used to create a Segment object.
+Author: Pranesh Velmurugan praneshsvels@gmail.com
+Date: 8/5/24
+"""
 from shapely import LineString
 from enum import Enum
 

@@ -1,3 +1,8 @@
+"""
+Module is used to create a Point object
+Author: Pranesh Velmurugan praneshsvels@gmail.com
+Date: 8/5/24
+"""
 from enum import Enum
 
 
