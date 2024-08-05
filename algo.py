@@ -239,7 +239,8 @@ def push_up(segment):
 
     if OPTIMIZED:  # it will use the original point if it is close enough to the endpoint of the segment
         point_x, point_y = Conversions.cartesian_to_gcs(point.coords[0][0], point.coords[0][1])
-        endpoint_x, endpoint_y = Conversions.cartesian_to_gcs(segment_endpoint.coords[0][0], segment_endpoint.coords[0][1])
+        endpoint_x, endpoint_y = Conversions.cartesian_to_gcs(
+                                    segment_endpoint.coords[0][0], segment_endpoint.coords[0][1])
         distance = Conversions.get_geodesic_length(LineString(((point_x, point_y), (endpoint_x, endpoint_y))))
         if point_y == 0:
             distance = float('inf')

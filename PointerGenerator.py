@@ -115,9 +115,9 @@ def segmentation(rgt_mask, land_mask, rgt):  # Uses modified land Mask
 
     ocean_intersections = rgt.difference(rgt_intersections)
     ocean_intersections = ocean_intersections.difference(land_intersections)
-    if not isinstance(ocean_intersections,LineString):
+    if not isinstance(ocean_intersections, LineString):
         ocean_intersections = MultiLineString([line_string for line_string in ocean_intersections.geoms
-                                           if not line_string.is_closed and line_string.dwithin(rgt, 1e-8)])
+                                               if not line_string.is_closed and line_string.dwithin(rgt, 1e-8)])
 
     add_segment(ocean_intersections, State.OCEAN)
     return segments
@@ -196,8 +196,10 @@ def sort_segments_by_coordinates(segments, starting_coordinate):
             line = segment.line_string
             curr_x, curr_y = Conversions.cartesian_to_gcs(current_coordinate[0], current_coordinate[1])
 
-            start_line = LineString((Point(curr_x, curr_y), Point(Conversions.cartesian_to_gcs(line.coords[0][0], line.coords[0][1]))))
-            end_line = LineString((Point(curr_x, curr_y), Point(Conversions.cartesian_to_gcs(line.coords[-1][0], line.coords[-1][1]))))
+            start_line = LineString((Point(curr_x, curr_y),
+                                     Point(Conversions.cartesian_to_gcs(line.coords[0][0], line.coords[0][1]))))
+            end_line = LineString((Point(curr_x, curr_y),
+                                   Point(Conversions.cartesian_to_gcs(line.coords[-1][0], line.coords[-1][1]))))
 
             start_dist = Conversions.get_geodesic_length(start_line)
             end_dist = Conversions.get_geodesic_length(end_line)
@@ -387,7 +389,8 @@ def remove_extra_endpoints(points_dict):
     :param points_dict: dictionary containing list of points
     """
     for i in range(1, 1387):
-        if points_dict[i][-1].created and not points_dict[i + 1][0].endpoint and points_dict[i][-1].state == points_dict[i + 1][0].state:
+        if (points_dict[i][-1].created and not points_dict[i + 1][0].endpoint and
+                points_dict[i][-1].state == points_dict[i + 1][0].state):
             points_dict[i].pop(-1)
 
         elif (points_dict[i + 1][0].created and

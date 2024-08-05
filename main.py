@@ -171,7 +171,8 @@ def main():
                                                          Conversions.gcs_list_to_cartesian(list(segments[i].coords))))
                 else:
                     segments_clean = Pg.segmentation(new_land_final_multi,
-                                                     LineString(Conversions.gcs_list_to_cartesian(list(segments[i].coords))))
+                                                     LineString(Conversions.gcs_list_to_cartesian(
+                                                         list(segments[i].coords))))
 
                 # Cleans segments and assigns points to them
                 segments_clean = Pg.remove_insignificant_segments(segments_clean)

@@ -64,4 +64,3 @@ def generate_asc_req(coords, points):
         #     point.asc_req = 0  # ascending
         # else:
         #     point.asc_req = 1  # descending
-

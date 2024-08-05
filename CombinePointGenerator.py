@@ -58,7 +58,6 @@ def segmentation(land_mask, rgt):
     and ocean/polar region rgt pointing. Uses modified land Mask
 
     All must use CARTESIAN coordinates
-    :param rgt_mask: Polygon/Multipolygon representing the rgt mask
     :param land_mask: Multipolygon representing USABLE land regions
     (shares no overlap with rgt_mask)
     :param rgt: LineString representing the RGT line
@@ -379,7 +378,8 @@ def remove_extra_endpoints(points_dict):
     :param points_dict: dictionary containing list of points
     """
     for i in range(1, 1387):
-        if points_dict[i][-1].created and not points_dict[i + 1][0].endpoint and points_dict[i][-1].state == points_dict[i + 1][0].state:
+        if (points_dict[i][-1].created and not points_dict[i + 1][0].endpoint and
+                points_dict[i][-1].state == points_dict[i + 1][0].state):
             points_dict[i].pop(-1)
 
         elif (points_dict[i + 1][0].created and
