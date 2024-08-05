@@ -51,3 +51,17 @@ def generate_asc_req(coords, points):
                 point.asc_req = 0  # ascending
             else:
                 point.asc_req = 1  # descending
+
+        # point_cpy = Point(point.longitude, point.latitude)
+        # dist1 = point_cpy.distance(segment1) / 1000
+        # dist2 = point_cpy.distance(segment2) / 1000
+        # dist3 = point_cpy.distance(segment3) / 1000
+        #
+        # # Compares distance between the point and the three segments
+        # min_dist = min(dist1, dist2, dist3)
+        #
+        # if min_dist == dist1 or min_dist == dist3:
+        #     point.asc_req = 0  # ascending
+        # else:
+        #     point.asc_req = 1  # descending
+

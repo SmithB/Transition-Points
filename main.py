@@ -115,7 +115,7 @@ def main():
 
     file_list.sort()  # Requires consistent file names
 
-    # Initalizes and populates a dictionary containing all the original Transition Points for each RGT
+    # Initializes and populates a dictionary containing all the original Transition Points for each RGT
     points_dict = {}
     for i in range(1, 1388):
         points_dict[i] = []
