@@ -58,7 +58,7 @@ def check_too_close_points(points_dict):
             length = Conversions.get_geodesic_length(line)
 
             if length < 1500:
-                too_close_rgts.append(f'{rgt}  {i}')
+                too_close_rgts.append(f'{rgt}  Points: {i+1}, {i+2}, {i+3}')
 
     return too_close_rgts
 
@@ -82,6 +82,6 @@ def points_within_threshold(points_dict, threshold):
             length = Conversions.get_geodesic_length(line)
 
             if length < threshold:
-                rgts.append(f'{rgt}  {i} {length}')
+                rgts.append(f'{rgt}  Points: {i+1}and {i+2}')
 
     return rgts
