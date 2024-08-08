@@ -9,8 +9,9 @@ Modules:
     Intersections: Contains functions for modifying and combining land masks
     KmlReader (Kr): Reads and parses KML files
     Conversions: Converts coordinates between geographic coordinate systems (GCS) and Cartesian
+    CombinePointGenerator/PointGenerator: Turns RGTs into segments, cleans them, and initially assigns points
     shapely: Library used for manipulation and analysis of planar geometries
-    algo: Processes and validating segments and Transition Points
+    algo: Processes and validates segments and Transition Points
     ShpConverter: Converts Shapefiles to KML format
     FileManager (Fm): Manages file read/write operations (csv and txt)
     AscReq: Generates asc_reqs

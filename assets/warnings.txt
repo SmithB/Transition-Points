@@ -1,9 +1,8 @@
-Errors:
+ERRORS:
 RGT: 915 
-Distance Errors:
 
 
-Warnings:
+WARNINGS:
 RGTs where large segments under threshold were skipped:
 RGT: 39 |  Points: 2 to 3 |  length: 515.505047111107
 RGT: 64 |  Points: 8 to 9 |  length: 521.690242246739
@@ -63,6 +62,7 @@ RGT: 1289 |  Points: 3 to 4 |  length: 517.9893263055712
 RGT: 1350 |  Points: 6 to 7 |  length: 540.3186983189371
 RGT: 1354 |  Points: 2 to 3 |  length: 529.9928681355077
 RGT: 1366 |  Points: 7 to 8 |  length: 523.5014917985599
+
 RGTs where there are multiple Transition Points in a 1500 km distance:
 RGT: 428  Points: 2, 3, 4
 

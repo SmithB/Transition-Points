@@ -73,8 +73,8 @@ def proceed_to_next(*widgets):
 # List of lambda functions that are the steps that the GUI follows
 steps = [
     lambda: setup_question("The program will take ~2 mins to process", ["Continue"], processing),
-    lambda: setup_question("Is the mask a kml or shapefile?", ["KML", "Shapefile"], set_mask_filetype),
-    lambda: setup_question("Is the mask region an off-pointing or RGT?", ["Off-Pointing", "RGT"], set_mask_region_type),
+    lambda: setup_question("Is the mask a kml file or shapefile?", ["KML", "Shapefile"], set_mask_filetype),
+    lambda: setup_question("Is the mask region an off-pointing or RGT region?", ["Off-Pointing", "RGT"], set_mask_region_type),
     lambda: setup_file_selection("Select mask file:", select_mask_filepath),
     lambda: setup_file_selection("Select Transition Point csv file:", select_transition_csv),
     lambda: setup_folder_selection("Select Folder to Store Files", select_files_folder),
