@@ -51,6 +51,43 @@ def split_anti_meridian(rgt):
 
     return segments
 
+def add_segment(intersections, segments, rgt, state):
+    """
+    function that add segments to list based of intersections and state
+    :param intersections: A geometry that is the intersection between two geometries
+    :param segments: List of segments to which the intersections are added
+    :param rgt: linestring representing the current rgt
+    :param state: State wanted for segments
+    """
+
+    if type(intersections) is LineString:
+        line = LineString(Conversions.cartesian_list_to_gcs(list(intersections.coords)))
+        length = Conversions.get_geodesic_length(line)
+
+        # Does not check for overlap with ocean segments due to floating-point precision errors
+        if state is not state.OCEAN:
+            if rgt.overlaps(intersections):
+                segment = Segment(intersections, state, length)
+                segments.append(segment)
+        else:
+            segment = Segment(intersections, state, length)
+            segments.append(segment)
+    else:
+        # intersection will usually be a MultiLineString
+        for intersection in intersections.geoms:
+            # Does not check for overlap with ocean segments due to floating-point precision errors
+            if state is not State.OCEAN:
+                if rgt.overlaps(intersection):
+                    intersection_gcs = LineString(Conversions.cartesian_list_to_gcs(intersection.coords))
+                    length = Conversions.get_geodesic_length(intersection_gcs)
+                    segment = Segment(intersection, state, length)
+                    segments.append(segment)
+            else:
+                intersection_gcs = LineString(Conversions.cartesian_list_to_gcs(intersection.coords))
+                length = Conversions.get_geodesic_length(intersection_gcs)
+                segment = Segment(intersection, state, length)
+                segments.append(segment)
+
 
 def segmentation(land_mask, rgt):
     """
@@ -65,43 +102,8 @@ def segmentation(land_mask, rgt):
     """
     segments = []
 
-    def add_segment(intersections, state):
-        """
-        Nested function that add segments to list based of intersections and state
-        :param intersections: A geometry that is the intersection between two geometries
-        :param state: State wanted for segments
-        """
-
-        if type(intersections) is LineString:
-            line = LineString(Conversions.cartesian_list_to_gcs(list(intersections.coords)))
-            length = Conversions.get_geodesic_length(line)
-
-            # Does not check for overlap with ocean segments due to floating-point precision errors
-            if state is not state.OCEAN:
-                if rgt.overlaps(intersections):
-                    segment = Segment(intersections, state, length)
-                    segments.append(segment)
-            else:
-                segment = Segment(intersections, state, length)
-                segments.append(segment)
-        else:
-            # intersection will usually be a MultiLineString
-            for intersection in intersections.geoms:
-                # Does not check for overlap with ocean segments due to floating-point precision errors
-                if state is not state.OCEAN:
-                    if rgt.overlaps(intersection):
-                        intersection_gcs = LineString(Conversions.cartesian_list_to_gcs(intersection.coords))
-                        length = Conversions.get_geodesic_length(intersection_gcs)
-                        segment = Segment(intersection, state, length)
-                        segments.append(segment)
-                else:
-                    intersection_gcs = LineString(Conversions.cartesian_list_to_gcs(intersection.coords))
-                    length = Conversions.get_geodesic_length(intersection_gcs)
-                    segment = Segment(intersection, state, length)
-                    segments.append(segment)
-
     land_intersections = Intersections.find_intersections(rgt, land_mask)
-    add_segment(land_intersections, State.VEGETATION)
+    add_segment(land_intersections, segments, rgt, State.VEGETATION)
     land_intersections = MultiLineString([segment.line_string for segment in segments if
                                           segment.state == State.VEGETATION])
 
@@ -109,7 +111,7 @@ def segmentation(land_mask, rgt):
     if not isinstance(ocean_intersections, LineString):
         ocean_intersections = MultiLineString([line_string for line_string in ocean_intersections.geoms
                                                if not line_string.is_closed and line_string.dwithin(rgt, 1e-8)])
-    add_segment(ocean_intersections, State.OCEAN)
+    add_segment(ocean_intersections, segments, rgt, State.OCEAN)
 
     return segments
 
@@ -384,7 +386,7 @@ def remove_extra_endpoints(points_dict):
             if (points_dict[i][-1].created and not points_dict[i + 1][0].endpoint and
                     points_dict[i][-1].state == points_dict[i + 1][0].state):
                 points_dict[i].pop(-1)
-    
+
             elif (points_dict[i + 1][0].created and
                   (points_dict[i][-1].state == points_dict[i + 1][0].state)):
                 points_dict[i + 1].pop(0)
